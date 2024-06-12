@@ -12,13 +12,13 @@ message(${HEADER_DIR}/graph.h)
 
 set(HEADER_FILES
     ${HEADER_DIR}/graph.h;
-    ${HEADER_DIR}/min-vertex-cover-solver.h;
+    ${HEADER_DIR}/min-vertex-cover.h;
     ${HEADER_DIR}/tree_decomposition.h
 )
 
 set(BODY_FILES
     ${BODY_DIR}/graph.cpp;
-    ${BODY_DIR}/min-vertex-cover-solver.cpp;
+    ${BODY_DIR}/min-vertex-cover.cpp;
     ${BODY_DIR}/tree_decomposition.cpp
 )
 
