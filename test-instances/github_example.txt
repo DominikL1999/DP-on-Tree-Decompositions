@@ -1,0 +1,8 @@
+first>second,red
+second>first,blue
+first,third,purple
+first>first,green
+first,,circle
+second,,circle
+third,,square
+fourth,,square
