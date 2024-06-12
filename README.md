@@ -12,7 +12,7 @@ The file format for the graphs is the CSV file format described in https://githu
 ## TODO
 
 - ✅ Write project summary in README.md.
-- Create CMakeLists.txt.
+- ✅ Create CMakeLists.txt.
 - Create classes for ...
     1. Graphs. This class should cover all combinations of:
         - Labelled / Unlabelled vertices
