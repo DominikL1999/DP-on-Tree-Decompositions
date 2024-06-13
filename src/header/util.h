@@ -12,6 +12,11 @@ bool contains(const std::vector<T>& vec, const T& elem) {
     return std::find(vec.begin(), vec.end(), elem) != vec.end();
 }
 
+template<typename T>
+bool setEqual(const std::vector<T>& vec1, const std::vector<T>& vec2) {
+    return std::all_of(vec1.begin(), vec1.end(), [&vec2](const T& x){return contains(vec2, x);});
+}
+
 template<typename T1, typename T2>
 std::vector<T2> map(const std::vector<T1>& vec1, std::function<T2(T1)>f) {
     std::vector<T2> vec2;

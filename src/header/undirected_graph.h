@@ -35,7 +35,9 @@ public:
 
     size_t numberOfEdges() const;
 
-    const std::vector<Vertex_Id>& getNeighbours(Vertex_Id v_id);
+    const std::vector<Vertex_Id>& getVertices() const;
+
+    const std::vector<Vertex_Id>& getNeighbours(Vertex_Id v_id) const;
 
     bool areNeighbours(Vertex_Id v_id1, Vertex_Id v_id2) const;
 
@@ -46,10 +48,10 @@ private:
 
     // TODO: Have this function return Vertex_Id and rework labelVertex and addEdge to take ids instead of names.
     // adds new vertex with given name if this vertex has not been added before
-    void addVertex(const std::string& name);
+    Vertex_Id addVertex(const std::string& name);
 
-    void labelVertex(const std::string& vertex_name, Vertex_Label label);
+    void labelVertex(Vertex_Id v_id, Vertex_Label label);
 
     // adds new edge. If the edge_type is different than what was previously seen, instead returns false
-    void addEdge(const std::string& v_id1, const std::string& v_id2);
+    void addEdge(Vertex_Id v_id1, Vertex_Id v_id2);
 };

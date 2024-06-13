@@ -2,8 +2,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 # TODO: List the files containing tests here.
 set (TEST_FILES
-    test_string_split.cpp;
-    test_map.cpp)
+    test_map.cpp;
+    test_set_equal.cpp;
+    test_string_split.cpp)
 
 string(REPLACE "${CMAKE_SOURCE_DIR}/" "" TestSuiteName "${CMAKE_CURRENT_SOURCE_DIR}")
 string(REPLACE "/" "_" TestSuiteName ${TestSuiteName})

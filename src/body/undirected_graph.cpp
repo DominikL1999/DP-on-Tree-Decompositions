@@ -27,14 +27,14 @@ UndirectedGraph UndirectedGraph::parseUnsafe(const string& input_path) {
         const std::string& v1_name = comma_parts[0];
         const std::string& v2_name = comma_parts[1];
         if (comma_parts.size() == 2) { // Case I
-            graph.addVertex(v1_name);
-            graph.addVertex(v2_name);
-            graph.addEdge(v1_name, v2_name);
+            Vertex_Id v1_id = graph.addVertex(v1_name);
+            Vertex_Id v2_id = graph.addVertex(v2_name);
+            graph.addEdge(v1_id, v2_id);
         }
         else if (comma_parts.size() == 3) { // Case II
             const std::string& label = comma_parts[2];
-            graph.addVertex(v1_name);
-            graph.labelVertex(v1_name, std::stod(label)); // immediately parse as number (double)
+            Vertex_Id v_id = graph.addVertex(v1_name);
+            graph.labelVertex(v_id, std::stod(label)); // immediately parse as number (double)
         }
         else {
             throw std::invalid_argument::exception();
@@ -44,8 +44,7 @@ UndirectedGraph UndirectedGraph::parseUnsafe(const string& input_path) {
     return graph;
 }
 
-std::string UndirectedGraph::idToName(Vertex_Id v_id) const
-{
+std::string UndirectedGraph::idToName(Vertex_Id v_id) const {
     return vertex_id_to_name.at(v_id);
 }
 
@@ -57,29 +56,30 @@ Vertex_Id UndirectedGraph::nameToId(const std::string &name) const
     return vertex_name_to_id.at(name);
 }
 
-size_t UndirectedGraph::numberOfNodes() const
-{
+size_t UndirectedGraph::numberOfNodes() const {
     return vertices.size();
 }
 
-size_t UndirectedGraph::numberOfEdges() const
-{
+size_t UndirectedGraph::numberOfEdges() const {
     return n_edges;
 }
 
-const std::vector<Vertex_Id>& UndirectedGraph::getNeighbours(Vertex_Id v_id)
-{
+const std::vector<Vertex_Id>& UndirectedGraph::getVertices() const {
+    return vertices;
+}
+
+const std::vector<Vertex_Id>& UndirectedGraph::getNeighbours(Vertex_Id v_id) const {
     return adjacencies.at(v_id);
 }
 
-bool UndirectedGraph::areNeighbours(Vertex_Id v_id1, Vertex_Id v_id2) const
-{
+bool UndirectedGraph::areNeighbours(Vertex_Id v_id1, Vertex_Id v_id2) const {
     return contains(adjacencies[v_id1], v_id2);
 }
 
-void UndirectedGraph::addVertex(const string &v_name) {
+Vertex_Id UndirectedGraph::addVertex(const string &v_name) {
+    Vertex_Id new_id;
     if (!vertex_name_to_id.contains(v_name)) {
-        Vertex_Id new_id = next_free_id++;
+        new_id = next_free_id++;
 
         vertices.push_back(new_id);
         adjacencies.push_back({});
@@ -88,16 +88,18 @@ void UndirectedGraph::addVertex(const string &v_name) {
         vertex_id_to_label.push_back({});
         vertex_name_to_id.insert({v_name, new_id});
     }
+    else {
+        new_id = vertex_name_to_id.at(v_name);
+    }
+
+    return new_id;
 }
 
-void UndirectedGraph::labelVertex(const string &vertex_name, Vertex_Label label) {
-    Vertex_Id v_id = vertex_name_to_id.at(vertex_name);
+void UndirectedGraph::labelVertex(Vertex_Id v_id, Vertex_Label label) {
     vertex_id_to_label[v_id] = label;
 }
 
-void UndirectedGraph::addEdge(const string& v_id1, const string& v_id2) {
-    Vertex_Id v1_id = vertex_name_to_id.at(v_id1);
-    Vertex_Id v2_id = vertex_name_to_id.at(v_id2);
+void UndirectedGraph::addEdge(Vertex_Id v1_id, Vertex_Id v2_id) {
     adjacencies[v1_id].push_back(v2_id);
     adjacencies[v2_id].push_back(v1_id);
     n_edges++;
