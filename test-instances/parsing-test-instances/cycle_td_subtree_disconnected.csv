@@ -1,0 +1,11 @@
+N1,N2
+N2,N3
+N3,N4
+N4,N5
+N5,N6
+N1,,a;b
+N2,,b;c
+N3,,c;d
+N4,,d;e
+N5,,e;f
+N6,,f;a

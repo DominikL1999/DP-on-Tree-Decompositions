@@ -8,6 +8,7 @@
 using Vertex_Id = std::size_t;
 using Vertex_Label = double;
 using UndirectedGraphAdjacencies = std::vector<std::vector<Vertex_Id>>;
+using Edge = std::pair<Vertex_Id, Vertex_Id>;
 
 /*
 Class for undirected graphs (with number labels for vertices) as required for the MINIMUM WEIGHTED VERTEX COVER problem.
@@ -15,6 +16,7 @@ Class for undirected graphs (with number labels for vertices) as required for th
 class UndirectedGraph {
     std::vector<Vertex_Id> vertices;
     UndirectedGraphAdjacencies adjacencies;
+    std::vector<Edge> edges;
 
     // The names of the vertices (usually just numbers). This is *not* the label of the vertex, because the labels represent a vertices' weight.
     std::vector<std::string> vertex_id_to_name;
@@ -22,7 +24,6 @@ class UndirectedGraph {
     std::unordered_map<std::string, Vertex_Id> vertex_name_to_id;
 
     size_t next_free_id = 0;
-    size_t n_edges = 0;
 
 public:
     static UndirectedGraph parseUnsafe(const std::string& input_path);
@@ -37,6 +38,8 @@ public:
 
     const std::vector<Vertex_Id>& getVertices() const;
 
+    const std::vector<Edge>& getEdges() const;
+
     const std::vector<Vertex_Id>& getNeighbours(Vertex_Id v_id) const;
 
     bool areNeighbours(Vertex_Id v_id1, Vertex_Id v_id2) const;
@@ -46,7 +49,6 @@ public:
 
 private:
 
-    // TODO: Have this function return Vertex_Id and rework labelVertex and addEdge to take ids instead of names.
     // adds new vertex with given name if this vertex has not been added before
     Vertex_Id addVertex(const std::string& name);
 

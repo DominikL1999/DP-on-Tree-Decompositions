@@ -1,6 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
-# TODO: List the files containing tests here.
 set (TEST_FILES
     test_parse_unsafe.cpp;
     test_is_valid.cpp)

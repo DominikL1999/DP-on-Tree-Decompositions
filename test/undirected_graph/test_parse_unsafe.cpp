@@ -22,7 +22,14 @@ bool test_parse_unsafe_1() {
     }
 
     std::vector<std::string>names{"a","b","c","d","e"};
-    success &= setEqual(map<std::string,Vertex_Id>(names, [&graph](const std::string& name){return graph.nameToId(name);}), graph.getVertices());
+    std::vector<Vertex_Id> vertices = map<std::string,Vertex_Id>(names, [&graph](const std::string& name){return graph.nameToId(name);});
+    success &= setEqual(vertices, graph.getVertices());
+
+    for (Vertex_Id v_id1 = 0; v_id1 < graph.numberOfNodes() - 1; v_id1++) {
+        for (Vertex_Id v_id2 = v_id1 + 1; v_id2 < graph.numberOfNodes(); v_id2++) {
+            success &= contains(graph.getEdges(), {v_id1, v_id2});
+        }
+    }
 
     return success;
 }

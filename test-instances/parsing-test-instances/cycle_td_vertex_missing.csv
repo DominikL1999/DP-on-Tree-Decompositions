@@ -2,6 +2,6 @@ N1,N2
 N2,N3
 N3,N4
 N1,,a;b;c
-N2,,a;c;d
-N3,,a;d;e
+N2,,a;c
+N3,,a;e
 N4,,a;e;f

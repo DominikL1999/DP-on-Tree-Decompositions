@@ -61,11 +61,15 @@ size_t UndirectedGraph::numberOfNodes() const {
 }
 
 size_t UndirectedGraph::numberOfEdges() const {
-    return n_edges;
+    return edges.size();
 }
 
 const std::vector<Vertex_Id>& UndirectedGraph::getVertices() const {
     return vertices;
+}
+
+const std::vector<Edge>& UndirectedGraph::getEdges() const {
+    return edges;
 }
 
 const std::vector<Vertex_Id>& UndirectedGraph::getNeighbours(Vertex_Id v_id) const {
@@ -102,7 +106,7 @@ void UndirectedGraph::labelVertex(Vertex_Id v_id, Vertex_Label label) {
 void UndirectedGraph::addEdge(Vertex_Id v1_id, Vertex_Id v2_id) {
     adjacencies[v1_id].push_back(v2_id);
     adjacencies[v2_id].push_back(v1_id);
-    n_edges++;
+    edges.push_back({std::min(v1_id, v2_id), std::max(v1_id, v2_id)});
 }
 
 std::ostream& operator<<(std::ostream& stream, const UndirectedGraph& graph) {

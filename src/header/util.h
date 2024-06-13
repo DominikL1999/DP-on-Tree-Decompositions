@@ -14,7 +14,8 @@ bool contains(const std::vector<T>& vec, const T& elem) {
 
 template<typename T>
 bool setEqual(const std::vector<T>& vec1, const std::vector<T>& vec2) {
-    return std::all_of(vec1.begin(), vec1.end(), [&vec2](const T& x){return contains(vec2, x);});
+    return std::all_of(vec1.begin(), vec1.end(), [&vec2](const T& x){return contains(vec2, x);}) &&
+        std::all_of(vec2.begin(), vec2.end(), [&vec1](const T& x){return contains(vec1, x);});
 }
 
 template<typename T1, typename T2>
@@ -22,6 +23,17 @@ std::vector<T2> map(const std::vector<T1>& vec1, std::function<T2(T1)>f) {
     std::vector<T2> vec2;
     vec2.resize(vec1.size());
     std::transform(vec1.begin(), vec1.end(), vec2.begin(), f);
+    return vec2;
+}
+
+template<typename T>
+std::vector<T> filter(const std::vector<T>& vec, std::function<bool(T)>f) {
+    std::vector<T> vec2;
+    for (const T& elem : vec) {
+        if (f(elem))
+            vec2.push_back(elem);
+    }
+
     return vec2;
 }
 
