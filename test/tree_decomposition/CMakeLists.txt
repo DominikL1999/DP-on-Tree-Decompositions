@@ -2,7 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 set (TEST_FILES
     test_parse_unsafe.cpp;
-    test_is_valid.cpp)
+    test_is_valid.cpp;
+    test_root_tree.cpp)
 
 string(REPLACE "${CMAKE_SOURCE_DIR}/" "" TestSuiteName "${CMAKE_CURRENT_SOURCE_DIR}")
 string(REPLACE "/" "_" TestSuiteName ${TestSuiteName})

@@ -15,6 +15,8 @@ II. a,,20   ... Label vertex (i.e. set weight)
 */
 UndirectedGraph UndirectedGraph::parseUnsafe(const string& input_path) {
     std::ifstream input(input_path);
+    if (!input)
+        throw std::invalid_argument::exception();
 
     UndirectedGraph graph;
 

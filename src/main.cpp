@@ -39,6 +39,16 @@ int main(int argc, char* argv[]) {
 
     UndirectedGraph graph = UndirectedGraph::parseUnsafe(input_path);
     TreeDecomposition td = TreeDecomposition::parseUnsafe(td_input_path, graph);
+    assert(!td.getNodes().empty());
 
     assert(td.isValid());
+
+    // std::vector<std::optional<Node_Id>> parents;
+    // std::vector<std::vector<Node_Id>> children;
+    // Node_Id root = td.rootTree(parents, children);
+
+
+    // Go recursively over all children and count the number of edges. If it is correct, the number of edges should be number of nodes - 1.
+
+    // cout << "parents: " << parents << endl;
 }

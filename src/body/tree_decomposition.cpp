@@ -18,6 +18,8 @@ II. N1,,a;b;c   ... Set bag for node
 TreeDecomposition TreeDecomposition::parseUnsafe(const std::string &input_path, const UndirectedGraph& graph)
 {
     std::ifstream input(input_path);
+    if (!input)
+        throw std::invalid_argument::exception();
 
     TreeDecomposition td{graph};
 
@@ -45,6 +47,8 @@ TreeDecomposition TreeDecomposition::parseUnsafe(const std::string &input_path, 
             throw std::invalid_argument::exception();
         }
     }
+
+    assert(!td.nodes.empty());
 
     return td;
 }
@@ -80,10 +84,10 @@ bool TreeDecomposition::isValid() const {
         assert(it != getNodes().end());
         to_visit.push(*it);
         while (!to_visit.empty()) {
-            Node_Id cur = to_visit.top();
+            Node_Id cur_n_id = to_visit.top();
             to_visit.pop();
-            visited.push_back(cur);
-            const std::vector<Node_Id>& neighbours = getNeighbours(cur);
+            visited.push_back(cur_n_id);
+            const std::vector<Node_Id>& neighbours = getNeighbours(cur_n_id);
             for (const Node_Id& n_id : neighbours) {
                 if (contains(visited, n_id) || (!contains(getBag(n_id), v_id)))
                     continue;
@@ -141,6 +145,50 @@ size_t TreeDecomposition::getTreewidth() const {
     return treewidth;
 }
 
+Node_Id TreeDecomposition::rootTree(std::vector<std::optional<Node_Id>>& parents, std::vector<std::vector<Node_Id>>& children) const {
+    std::cout << "blksdfölkj" << std::endl;
+    assert(!nodes.empty());
+    Node_Id node_with_largest_bag = *std::max_element(nodes.begin(), nodes.end(), [this](Node_Id n1_id, Node_Id n2_id) {
+        std::cout << "n1_id: " << n1_id << " | n2_id: " << n2_id << std::endl;
+        return getBag(n1_id).size() <= getBag(n2_id).size();
+    });
+    std::cout << "blksdfölkj" << std::endl;
+    std::cout << "node_with_largest_bag: " << idToName(node_with_largest_bag) << " (id: " << node_with_largest_bag << ")" << std::endl;
+
+    rootTree(parents, children, node_with_largest_bag);
+
+    return node_with_largest_bag;
+}
+
+void TreeDecomposition::rootTree(std::vector<std::optional<Node_Id>> &parents, std::vector<std::vector<Node_Id>> &children, Node_Id designated_root) const {
+    parents.clear();
+    children.clear();
+    parents.resize(nodes.size());
+    children.resize(nodes.size());
+
+    std::vector<bool> visited(nodes.size(), false);
+
+    std::stack<Node_Id> to_visit;
+    to_visit.push(designated_root);
+
+    while (!to_visit.empty()) {
+        Node_Id cur_n_id = to_visit.top();
+        to_visit.pop();
+        visited[cur_n_id] = true;
+        const std::vector<Node_Id>& neighbours = getNeighbours(cur_n_id);
+        // Set cur_n_id as parent of neighbours that have not been visited yet. Add all those neighbours to to_visit
+        for (const Node_Id& neighbour : neighbours) {
+            if (visited[neighbour])
+                continue; // has been visited already
+            else {
+                parents[neighbour] = cur_n_id;
+                children[cur_n_id].push_back(neighbour);
+                to_visit.push(neighbour);
+            }
+        }
+    }
+}
+
 Node_Id TreeDecomposition::addNode(const std::string &n_name) {
     Node_Id new_id;
     if (!node_name_to_id.contains(n_name)) {
@@ -155,6 +203,8 @@ Node_Id TreeDecomposition::addNode(const std::string &n_name) {
     else {
         new_id = node_name_to_id.at(n_name);
     }
+
+    assert(!nodes.empty());
 
     return new_id;
 }

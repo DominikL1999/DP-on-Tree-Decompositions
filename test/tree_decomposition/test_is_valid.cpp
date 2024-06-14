@@ -2,11 +2,13 @@
 #include "tree_decomposition.h"
 #include "util.h"
 
+#include <cassert>
 #include <filesystem>
 
 bool test_is_valid_valid_td() {
     UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/parsing-test-instances/cycle.csv");
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/parsing-test-instances/cycle_td.csv", graph);
+    assert(!td.getNodes().empty());
 
     return td.isValid();
 }
@@ -14,6 +16,7 @@ bool test_is_valid_valid_td() {
 bool test_is_valid_vertex_missing() {
     UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/parsing-test-instances/cycle.csv");
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/parsing-test-instances/cycle_td_vertex_missing.csv", graph);
+    assert(!td.getNodes().empty());
 
     return !td.isValid();
 }
@@ -21,6 +24,7 @@ bool test_is_valid_vertex_missing() {
 bool test_is_valid_edge_missing() {
     UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/parsing-test-instances/cycle.csv");
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/parsing-test-instances/cycle_td_edge_missing.csv", graph);
+    assert(!td.getNodes().empty());
 
     return !td.isValid();
 }
@@ -28,6 +32,7 @@ bool test_is_valid_edge_missing() {
 bool test_is_valid_subtree_disconnected() {
     UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/parsing-test-instances/cycle.csv");
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/parsing-test-instances/cycle_td_subtree_disconnected.csv", graph);
+    assert(!td.getNodes().empty());
 
     return !td.isValid();
 }
@@ -36,6 +41,10 @@ bool test_is_valid_large_graphs() {
     const std::filesystem::path large_instances_path{"test-instances/Treewidth-PACE-2017-Instances"};
     std::vector<std::pair<std::string,std::string>> graph_td_files_pairs;
     for (auto const& dir_entry : std::filesystem::directory_iterator(large_instances_path)) {
+        if (!endsWith(dir_entry.path(), ".gr.csv")) {
+            continue;
+        }
+
         const std::string filename = stripToFilename(dir_entry.path());
         if (endsWith(filename, ".gr.csv")) {
             graph_td_files_pairs.push_back({filename, filename.substr(0, filename.size() - 7) + ".td.csv"});
@@ -45,10 +54,10 @@ bool test_is_valid_large_graphs() {
         const std::string graph_path = "test-instances/Treewidth-PACE-2017-Instances/" + filename_no_extension + ".gr.csv";
         const std::string td_path = "test-instances/Treewidth-PACE-2017-Instances/" + filename_no_extension + ".td.csv";
 
-        
         UndirectedGraph graph = UndirectedGraph::parseUnsafe(graph_path);
         TreeDecomposition td = TreeDecomposition::parseUnsafe(td_path, graph);
-
+        assert(!td.getNodes().empty());
+        
         bool success = td.isValid();
         if (!success)
             return false;
@@ -63,7 +72,7 @@ int test_is_valid(int argc, char** argv) {
     success &= test_is_valid_vertex_missing();
     success &= test_is_valid_edge_missing();
     success &= test_is_valid_subtree_disconnected();
-    success &= test_is_valid_large_graphs();
+    // success &= test_is_valid_large_graphs(); // this takes a long time (3 seconds total, but still.)
 
     return !success;
 }

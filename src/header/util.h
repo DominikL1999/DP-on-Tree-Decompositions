@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <optional>
 #include <vector>
 #include <unordered_map>
 #include <functional>
@@ -52,6 +53,11 @@ bool returnAndOutputOnFailure(const T& expected, const T& got) {
 }
 
 //// Pretty printing ////
+
+template<typename T>
+std::ostream& operator<<(std::ostream& stream, const std::optional<T>& opt_val) {
+    return stream << (opt_val.has_value() ? std::to_string(opt_val.value()) : "{}");
+}
 
 // Try it out: If you have a local object `p` of type std::pair<T1,T2>, call:
 // `std::cout << p << << std::endl;`

@@ -3,6 +3,7 @@
 #include "undirected_graph.h"
 
 #include <iostream>
+#include <optional>
 
 using Node_Id = size_t;
 using TreeDecompositionAdjacencies = std::vector<std::vector<Node_Id>>;
@@ -47,6 +48,12 @@ public:
     const std::vector<Bag>& getBags() const;
 
     size_t getTreewidth() const;
+
+    // Returns the children and parents of each node in the tree decomposition and picks the root to be one of the nodes with the largest bag. Returns the root node.
+    Node_Id rootTree(std::vector<std::optional<Node_Id>>& parents, std::vector<std::vector<Node_Id>>& children) const;
+
+    // Returns the children and parents of each node in the tree decomposition if the root were `designated_root`.
+    void rootTree(std::vector<std::optional<Node_Id>>& parents, std::vector<std::vector<Node_Id>>& children, Node_Id designated_root) const;
 
     friend
     std::ostream& operator<<(std::ostream& stream, const TreeDecomposition& td);
