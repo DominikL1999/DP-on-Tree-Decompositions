@@ -1,8 +1,9 @@
-#include <iostream>
-
 #include "undirected_graph.h"
 #include "tree_decomposition.h"
 #include "util.h"
+
+#include <iostream>
+#include <cassert>
 
 using std::cout;
 using std::endl;
@@ -37,7 +38,7 @@ int main(int argc, char* argv[]) {
         return 1;
 
     UndirectedGraph graph = UndirectedGraph::parseUnsafe(input_path);
-    cout << "graph: " << graph << endl;
     TreeDecomposition td = TreeDecomposition::parseUnsafe(td_input_path, graph);
-    cout << "tree decomposition: " << td << endl;
+
+    assert(td.isValid());
 }

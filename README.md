@@ -14,15 +14,11 @@ The file format for the graphs is the CSV file format described in https://githu
 - ✅ Write project summary in README.md.
 - ✅ Create CMakeLists.txt.
 - Create classes for ...
-    1. Graphs. This class should cover all combinations of:
-        - Labelled / Unlabelled vertices
-        - Labelled / Unlabelled edges (for interoperability with other projects)
-        - Directed / Undirected edges (for interoperability with other projects)\
-        All labels may be assumed to be numbers.
-    2. Tree Decompositions
+    1. ✅ Graphs
+    2. ✅ Tree Decompositions
     3. Solver
-- Come up with tiny problem instances.
-- Parse tiny problem instances.
-- Find/come up with (possibly large) instances with small treewidth to test solver on.
+- ✅ Come up with tiny problem instances.
+- ✅ Parse tiny problem instances.
+- ✅ Find/come up with (possibly large) instances with small treewidth to test solver on.
 - Solve MINIMUM WEIGHTED VERTEX COVER on instances with small treewidth.
 - Write unit test to check correctness of solver by brute forcing all possible solutions for the tiny instances.

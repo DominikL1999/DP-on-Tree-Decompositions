@@ -51,29 +51,29 @@ TreeDecomposition TreeDecomposition::parseUnsafe(const std::string &input_path, 
 
 bool TreeDecomposition::isValid() const {
     // Property 1: Every vertex appears in some bag
-    const UndirectedGraph& graph = *graph_ptr;
-    const std::vector<Vertex_Id> vertices = graph.getVertices();
+    const std::vector<Vertex_Id> vertices = graph_ptr->getVertices();
     bool success = std::all_of(vertices.begin(), vertices.end(), [this](const Vertex_Id& v_id){
         return std::any_of(nodes.begin(), nodes.end(), [this, v_id](const Node_Id& n_id){
             return contains(getBag(n_id), v_id);
         });
     });
-    if (!success)
+    if (!success) {
         return false;
+    }
 
     // Property 2: Every edge appears in some bag
-    const std::vector<Edge>& edges = graph.getEdges();
+    const std::vector<Edge>& edges = graph_ptr->getEdges();
     success = std::all_of(edges.begin(), edges.end(), [this](const Edge& edge){
         return std::any_of(getBags().begin(), getBags().end(), [&edge](const Bag& bag){
             return contains(bag, edge.first) && contains(bag, edge.second);
         });
     });
-    if (!success)
+    if (!success) {
         return false;
+    }
 
     // Property 3: For every vertex v, the subtree containing vertex v in its bags is connected.
     success = std::all_of(vertices.begin(), vertices.end(), [this](const Vertex_Id v_id){
-        std::cout << "v_id: " << v_id << std::endl;
         std::vector<Node_Id> visited;
         std::stack<Node_Id> to_visit;
         auto it = std::find_if(getNodes().begin(), getNodes().end(), [this,v_id](const Node_Id& n_id){return contains(getBag(n_id), v_id);});
@@ -94,12 +94,11 @@ bool TreeDecomposition::isValid() const {
         }
 
         auto filtered = filter<Node_Id>(nodes, [this, v_id](Node_Id n_id){return contains(getBag(n_id), v_id);});
-        std::cout << "visited: " << visited << std::endl;
-        std::cout << "filtered: " << filtered << std::endl;
         return setEqual(visited, filter<Node_Id>(nodes, [this, v_id](Node_Id n_id){return contains(getBag(n_id), v_id);}));
     });
-    if (!success)
+    if (!success) {
         return false;
+    }
 
     return true;
 }

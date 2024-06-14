@@ -16,3 +16,22 @@ std::vector<std::string> stringSplit(const std::string &str, char delim)
 
     return parts;
 }
+
+bool endsWith(const std::string& str, const std::string& end) {
+    if (end.size() > str.size())
+        return false;
+    return str.substr(str.size() - end.size()) == end;
+}
+
+std::string stripToFilename(const std::string& path) {
+    size_t slash_pos = path.find_last_of('/');
+    size_t backslash_pos = path.find_last_of('\\');
+    if (slash_pos == SIZE_MAX && backslash_pos == SIZE_MAX)
+        return path;
+    else if (slash_pos == SIZE_MAX)
+        return path.substr(backslash_pos + 1);
+    else if (backslash_pos == SIZE_MAX)
+        return path.substr(slash_pos + 1);
+    else
+        return path.substr(std::max(slash_pos, backslash_pos));
+}

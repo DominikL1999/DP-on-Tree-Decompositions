@@ -7,6 +7,10 @@
 
 std::vector<std::string> stringSplit(const std::string& str, char delim);
 
+bool endsWith(const std::string& str, const std::string& end);
+
+std::string stripToFilename(const std::string& path);
+
 template<typename T>
 bool contains(const std::vector<T>& vec, const T& elem) {
     return std::find(vec.begin(), vec.end(), elem) != vec.end();

@@ -1,10 +1,12 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 set (TEST_FILES
+    test_ends_with.cpp;
     test_filter.cpp;
     test_map.cpp;
     test_set_equal.cpp;
-    test_string_split.cpp)
+    test_string_split.cpp;
+    test_strip_to_filename.cpp)
 
 string(REPLACE "${CMAKE_SOURCE_DIR}/" "" TestSuiteName "${CMAKE_CURRENT_SOURCE_DIR}")
 string(REPLACE "/" "_" TestSuiteName ${TestSuiteName})
