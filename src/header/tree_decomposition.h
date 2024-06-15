@@ -3,16 +3,28 @@
 #include "undirected_graph.h"
 
 #include <iostream>
+#include <unordered_set>
 #include <optional>
 
 using Node_Id = size_t;
 using TreeDecompositionAdjacencies = std::vector<std::vector<Node_Id>>;
-using Bag = std::vector<Vertex_Id>;
+using Bag = std::unordered_set<Vertex_Id>;
 using TD_Edge = std::pair<Node_Id, Node_Id>;
+
+template<>
+struct std::hash<TD_Edge>
+{
+    size_t operator()(const TD_Edge& td_edge) const {
+        size_t seed = 0;
+        seed ^= std::hash<int>{}(td_edge.first) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= std::hash<int>{}(td_edge.second) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        return seed;
+    }
+};
 
 class TreeDecomposition {
     std::vector<Node_Id> nodes;
-    std::vector<TD_Edge> edges;
+    std::unordered_set<TD_Edge> edges;
     TreeDecompositionAdjacencies adjacencies;
 
     std::vector<std::string> node_id_to_name;
@@ -24,6 +36,11 @@ class TreeDecomposition {
     size_t next_free_id = 0;
     size_t treewidth = 0;
 
+    // To root tree:
+    std::optional<Node_Id> root={};
+    std::vector<std::optional<Node_Id>> parents;
+    std::vector<std::vector<Node_Id>> children;
+
 public:
 
     static TreeDecomposition parseUnsafe(const std::string& input_path, const UndirectedGraph& graph);
@@ -33,7 +50,7 @@ public:
 
     const std::vector<Node_Id>& getNodes() const;
 
-    const std::vector<TD_Edge>& getEdges() const;
+    const std::unordered_set<TD_Edge>& getEdges() const;
 
     bool areNeighbours(Node_Id n_id1, Node_Id n_id2) const;
 
@@ -49,11 +66,27 @@ public:
 
     size_t getTreewidth() const;
 
+    //// To root tree ////
+
+    bool isRooted() const;
+
+    const Node_Id& getRoot() const;
+
     // Returns the children and parents of each node in the tree decomposition and picks the root to be one of the nodes with the largest bag. Returns the root node.
-    Node_Id rootTree(std::vector<std::optional<Node_Id>>& parents, std::vector<std::vector<Node_Id>>& children) const;
+    Node_Id rootTree();
 
     // Returns the children and parents of each node in the tree decomposition if the root were `designated_root`.
-    void rootTree(std::vector<std::optional<Node_Id>>& parents, std::vector<std::vector<Node_Id>>& children, Node_Id designated_root) const;
+    void rootTree(Node_Id designated_root);
+
+    const std::vector<std::optional<Node_Id>>& getParents() const;
+
+    const std::vector<std::vector<Node_Id>>& getChildren() const;
+
+    //// To make it a nice tree decomposition ////
+
+    void turnIntoNiceTreeDecomposition();
+
+    void makeNJoinNodeNice(Node_Id n_id);
 
     friend
     std::ostream& operator<<(std::ostream& stream, const TreeDecomposition& td);
@@ -65,5 +98,7 @@ private:
     
     void addEdge(Node_Id n1_id, Node_Id n2_id);
 
-    void setBag(Node_Id n_id, const std::vector<Vertex_Id>& bag_content);
+    void removeEdge(Node_Id n1_id, Node_Id n2_id);
+
+    void setBag(Node_Id n_id, Bag&& bag_content);
 };

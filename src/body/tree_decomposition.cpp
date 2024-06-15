@@ -40,7 +40,11 @@ TreeDecomposition TreeDecomposition::parseUnsafe(const std::string &input_path, 
         else if (comma_parts.size() == 3) { // Case II
             std::vector<string> bag_contents_names = stringSplit(comma_parts[2], ';');
             Node_Id n_id = td.addNode(n1_name);
-            td.setBag(n_id, map<string, Vertex_Id>(bag_contents_names, [&graph](const std::string& v_name){return graph.nameToId(v_name);}));
+            Bag bag;
+            for (const string& v_name : bag_contents_names) {
+                bag.insert(graph.nameToId(v_name));
+            }
+            td.setBag(n_id, std::move(bag));
             td.treewidth = std::max(td.treewidth, bag_contents_names.size() - 1);
         }
         else {
@@ -51,6 +55,27 @@ TreeDecomposition TreeDecomposition::parseUnsafe(const std::string &input_path, 
     assert(!td.nodes.empty());
 
     return td;
+}
+
+/*
+A "nice" tree decomposition is a tree decomposition where each node falls into exactly one of four categories:
+    I   Leaf Node       ... A node with no children and any number of vertices in its bag
+    II  Introduce Node  ... A node whose bag contains exactly one additional vertex when compared to its (single) child's bag.
+    III Forget Node     ... A node whose (single) child's bag contains exactly one additional vertex when compared to its own bag.
+    IV  Join Node       ... A node with two children with all equal bags.
+
+How to get a nice tree decomposition:
+- Between any two (connected) nodes, "subdivide" their difference into multiple nodes.
+- Let C be the set of children of a node n with bag B. If |C| >= 2, create a chain of nodes each with bag B the size of |C| - 2 and append it to n. Add n and all created nodes to "root_nodes". Assert(|root_nodes| == |C| - 1). The last node added should be added twice.
+*/
+void TreeDecomposition::turnIntoNiceTreeDecomposition() {
+
+}
+
+void TreeDecomposition::makeNJoinNodeNice(Node_Id n_id) {
+    // std::vector<Node_Id> new_nodes;
+    // Node_Id last_node = n_id;
+    // TODO
 }
 
 bool TreeDecomposition::isValid() const {
@@ -111,7 +136,7 @@ const std::vector<Node_Id>& TreeDecomposition::getNodes() const {
     return nodes;
 }
 
-const std::vector<TD_Edge>& TreeDecomposition::getEdges() const {
+const std::unordered_set<TD_Edge>& TreeDecomposition::getEdges() const {
     return edges;
 }
 
@@ -145,22 +170,27 @@ size_t TreeDecomposition::getTreewidth() const {
     return treewidth;
 }
 
-Node_Id TreeDecomposition::rootTree(std::vector<std::optional<Node_Id>>& parents, std::vector<std::vector<Node_Id>>& children) const {
-    std::cout << "blksdfölkj" << std::endl;
+bool TreeDecomposition::isRooted() const {
+    return root.has_value();
+}
+
+const Node_Id& TreeDecomposition::getRoot() const {
+    assert(isRooted());
+    return root.value();
+}
+
+Node_Id TreeDecomposition::rootTree() {
     assert(!nodes.empty());
     Node_Id node_with_largest_bag = *std::max_element(nodes.begin(), nodes.end(), [this](Node_Id n1_id, Node_Id n2_id) {
-        std::cout << "n1_id: " << n1_id << " | n2_id: " << n2_id << std::endl;
         return getBag(n1_id).size() <= getBag(n2_id).size();
     });
-    std::cout << "blksdfölkj" << std::endl;
-    std::cout << "node_with_largest_bag: " << idToName(node_with_largest_bag) << " (id: " << node_with_largest_bag << ")" << std::endl;
 
-    rootTree(parents, children, node_with_largest_bag);
+    rootTree(node_with_largest_bag);
 
     return node_with_largest_bag;
 }
 
-void TreeDecomposition::rootTree(std::vector<std::optional<Node_Id>> &parents, std::vector<std::vector<Node_Id>> &children, Node_Id designated_root) const {
+void TreeDecomposition::rootTree(Node_Id designated_root) {
     parents.clear();
     children.clear();
     parents.resize(nodes.size());
@@ -189,6 +219,14 @@ void TreeDecomposition::rootTree(std::vector<std::optional<Node_Id>> &parents, s
     }
 }
 
+const std::vector<std::optional<Node_Id>>& TreeDecomposition::getParents() const {
+    return parents;
+}
+
+const std::vector<std::vector<Node_Id>>& TreeDecomposition::getChildren() const {
+    return children;
+}
+
 Node_Id TreeDecomposition::addNode(const std::string &n_name) {
     Node_Id new_id;
     if (!node_name_to_id.contains(n_name)) {
@@ -212,11 +250,18 @@ Node_Id TreeDecomposition::addNode(const std::string &n_name) {
 void TreeDecomposition::addEdge(Node_Id n1_id, Node_Id n2_id) {
     adjacencies[n1_id].push_back(n2_id);
     adjacencies[n2_id].push_back(n1_id);
-    edges.push_back({std::min(n1_id, n2_id), std::max(n1_id, n2_id)});
+    edges.insert({std::min(n1_id, n2_id), std::max(n1_id, n2_id)});
 }
 
-void TreeDecomposition::setBag(Node_Id n_id, const std::vector<Vertex_Id>& bag_content) {
-    node_id_to_bag_contents[n_id] = std::vector<Vertex_Id>{bag_content.begin(), bag_content.end()};
+void TreeDecomposition::removeEdge(Node_Id n1_id, Node_Id n2_id) {
+    // Remove edge in adjacencies
+    // Remove edge in edges
+    // If tree is rooted: Remove edge in parents and children.
+}
+
+void TreeDecomposition::setBag(Node_Id n_id, Bag&& bag_content) {
+    std::swap(node_id_to_bag_contents[n_id], bag_content);
+    // node_id_to_bag_contents[n_id] = std::vector<Vertex_Id>{bag_content.begin(), bag_content.end()};
 }
 
 std::ostream &operator<<(std::ostream &stream, const TreeDecomposition &td)

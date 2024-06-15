@@ -10,10 +10,9 @@ int test_root_tree(int argc, char** argv) {
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/Treewidth-PACE-2027-Instances/ex001.td.csv", graph);
     assert(td.isValid());
 
-    std::vector<std::optional<Node_Id>> parents;
-    std::vector<std::vector<Node_Id>> children;
-
-    Node_Id root = td.rootTree(parents, children);
+    Node_Id root = td.rootTree();
+    const auto& parents = td.getParents();
+    const auto& children = td.getChildren();
 
     // Go recursively over all children and count the number of edges. If it is correct, the number of edges should be number of nodes - 1.
     std::vector<bool> visited(td.getNodes().size(), false);
@@ -35,6 +34,7 @@ int test_root_tree(int argc, char** argv) {
     }
 
     bool success = edge_count == td.getNodes().size() - 1;
+    success &= td.getEdges().size() == edge_count;
 
     return !success;
 }

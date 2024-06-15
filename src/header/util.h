@@ -3,6 +3,7 @@
 #include <iostream>
 #include <optional>
 #include <vector>
+#include <unordered_set>
 #include <unordered_map>
 #include <functional>
 
@@ -18,6 +19,11 @@ bool contains(const std::vector<T>& vec, const T& elem) {
 }
 
 template<typename T>
+bool contains(const std::unordered_set<T>& set, const T& elem) {
+    return set.find(elem) != set.end();
+}
+
+template<typename T>
 bool setEqual(const std::vector<T>& vec1, const std::vector<T>& vec2) {
     return std::all_of(vec1.begin(), vec1.end(), [&vec2](const T& x){return contains(vec2, x);}) &&
         std::all_of(vec2.begin(), vec2.end(), [&vec1](const T& x){return contains(vec1, x);});
@@ -29,6 +35,16 @@ std::vector<T2> map(const std::vector<T1>& vec1, std::function<T2(T1)>f) {
     vec2.resize(vec1.size());
     std::transform(vec1.begin(), vec1.end(), vec2.begin(), f);
     return vec2;
+}
+
+template<typename T1, typename T2>
+std::unordered_set<T2> map(const std::unordered_set<T1>& set, std::function<T2(T1)>f) {
+    std::unordered_set<T2> result_set;
+    for (const T1& elem : set) {
+        result_set.insert(f(elem));
+    }
+
+    return result_set;
 }
 
 template<typename T>
@@ -77,6 +93,15 @@ std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vec) {
             stream << ",";
     }
     stream << "]";
+    return stream;
+}
+
+// Try it out: If you have a local object `v` of type std::unordered_set<T>, call:
+// `std::cout << v << << std::endl;`
+template<typename T>
+std::ostream& operator<<(std::ostream& stream, const std::unordered_set<T>& set) {
+    for (const T& elem : set)
+        stream << elem << " ";
     return stream;
 }
 
