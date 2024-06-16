@@ -3,8 +3,8 @@
 #include "util.h"
 
 bool test_parse_unsafe_1() {
-    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/parsing-test-instances/cycle.csv");
-    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/parsing-test-instances/cycle_td.csv", graph);
+    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/cycle.gr.csv");
+    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/cycle.td.csv", graph);
 
     bool success = returnAndOutputOnFailure((size_t)2, td.getTreewidth());
 

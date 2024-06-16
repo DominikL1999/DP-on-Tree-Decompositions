@@ -2,7 +2,7 @@
 #include "util.h"
 
 bool test_parse_unsafe_1() {
-    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/parsing-test-instances/k_5.csv");
+    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/k5.gr.csv");
     bool success = returnAndOutputOnFailure((size_t)5, graph.numberOfNodes());
     success &= returnAndOutputOnFailure((size_t)10, graph.numberOfEdges());
     for (Vertex_Id v_id1 = 0; v_id1 < graph.numberOfNodes() - 1; v_id1++) {

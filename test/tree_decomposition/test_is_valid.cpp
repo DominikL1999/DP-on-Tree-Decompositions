@@ -6,32 +6,32 @@
 #include <filesystem>
 
 bool test_is_valid_valid_td() {
-    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/parsing-test-instances/cycle.csv");
-    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/parsing-test-instances/cycle_td.csv", graph);
+    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/cycle.gr.csv");
+    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/cycle.td.csv", graph);
     assert(!td.getNodes().empty());
 
     return td.isValid();
 }
 
 bool test_is_valid_vertex_missing() {
-    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/parsing-test-instances/cycle.csv");
-    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/parsing-test-instances/cycle_td_vertex_missing.csv", graph);
+    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/cycle.gr.csv");
+    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/cycle_vertex_missing.td.csv", graph);
     assert(!td.getNodes().empty());
 
     return !td.isValid();
 }
 
 bool test_is_valid_edge_missing() {
-    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/parsing-test-instances/cycle.csv");
-    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/parsing-test-instances/cycle_td_edge_missing.csv", graph);
+    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/cycle.gr.csv");
+    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/cycle_edge_missing.td.csv", graph);
     assert(!td.getNodes().empty());
 
     return !td.isValid();
 }
 
 bool test_is_valid_subtree_disconnected() {
-    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/parsing-test-instances/cycle.csv");
-    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/parsing-test-instances/cycle_td_subtree_disconnected.csv", graph);
+    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/cycle.gr.csv");
+    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/cycle_subtree_disconnected.td.csv", graph);
     assert(!td.getNodes().empty());
 
     return !td.isValid();
