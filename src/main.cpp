@@ -42,26 +42,9 @@ int main(int argc, char* argv[]) {
     assert(!td.getNodes().empty());
     assert(td.isValid());
 
-    cout << "td: " << td << endl;
-
-    cout << "==== ROOT TREE DECOMPOSITION ==== " << endl;
     td.rootTree(td.nameToId("N1"));
-
-    cout << "==== BRIDGE DIFFERENCE (N1) ====" << endl;
-    td.bridgeDifference(td.nameToId("N1"));
+    td.makeNJoinNodeNice(td.nameToId("N1"));
+    cout << "=====================================" << endl;
     cout << "td:" << td << endl;
-
-    cout << "==== BRIDGE DIFFERENCE (N3) ====" << endl;
-    td.bridgeDifference(td.nameToId("N3"));
-    cout << "td:" << td << endl;
-
-    cout << "==== BRIDGE DIFFERENCE (N2) ====" << endl;
-    td.bridgeDifference(td.nameToId("N2"));
-    cout << "td:" << td << endl;
-
-    cout << "==== BRIDGE DIFFERENCE (N2) ====" << endl;
-    td.bridgeDifference(td.nameToId("N2"));
-    cout << "td:" << td << endl;
-
-    assert(td.isValid());
+    cout << "isNiceTreeDecomposition: " << td.isNiceTreeDecomposition() << endl;
 }

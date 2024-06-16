@@ -32,8 +32,25 @@ bool test_bridge_difference_order(std::string root, const std::vector<std::strin
     return success;
 }
 
+bool test_bridge_difference_2() {
+    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/sigma_graph.gr.csv");
+    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/sigma_graph.td.csv", graph);
+
+    td.rootTree(td.nameToId("N1"));
+    td.bridgeDifference(td.nameToId("N1"));
+
+    bool success = true;
+    
+    success &= returnAndOutputOnFailure(true, td.isValid());
+    success &= returnAndOutputOnFailure(true, td.isNiceTreeDecomposition());
+
+    return success;
+}
+
 int test_bridge_difference(int argc, char** argv) {
     bool success = true;
+
+    success &= test_bridge_difference_2();
 
     success &= test_bridge_difference_order("N1", {"N1","N2","N3"});
     success &= test_bridge_difference_order("N1", {"N1","N3","N2"});

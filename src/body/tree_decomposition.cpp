@@ -71,11 +71,48 @@ How to get a nice tree decomposition:
 - Between any two (connected) nodes, "subdivide" their difference into multiple nodes.
 - Let C be the set of children of a node n with bag B. If |C| >= 2, create a chain of nodes each with bag B the size of |C| - 2 and append it to n. Add n and all created nodes to "root_nodes". Assert(|root_nodes| == |C| - 1). The last node added should be added twice.
 */
-void TreeDecomposition::turnIntoNiceTreeDecomposition() {
+bool TreeDecomposition::isNiceTreeDecomposition() const {
+    if (!isValid())
+        return false;
 
+    if (!isRooted())
+        return false;
+    
+    bool is_valid = true;
+    doWhilePreOrder([this, &is_valid](const Node_Id& n_id) {
+        auto& node_children = getChildrenOf(n_id);
+        const Bag& n_bag = getBag(n_id);
+        if (node_children.size() == 0) {
+            return;
+        }
+        else if (node_children.size() == 1) {
+            Node_Id child_id = *node_children.begin();
+            const Bag& child_bag = getBag(child_id);
+            size_t diff1 = setDifferrence(n_bag, child_bag).size();
+            size_t diff2 = setDifferrence(child_bag, n_bag).size();
+            if (!(diff1 == 0 && diff2 == 1 || diff1 == 1 && diff2 == 0)) {
+                is_valid = false;
+            }
+            return;
+        }
+
+        for (const Node_Id& child_id : node_children) {
+            const Bag& child_bag = getBag(child_id);
+            if (child_bag != n_bag) {
+                is_valid = false;
+                return;
+            }
+        }
+    }, [&is_valid](){return is_valid;});
+
+    return is_valid;
+}
+
+void TreeDecomposition::turnIntoNiceTreeDecomposition() {
 }
 
 void TreeDecomposition::bridgeDifference(const Node_Id parent_id) {
+
     const auto& children = getChildren();
     assert(children[parent_id].size() == 1);
 
@@ -83,7 +120,7 @@ void TreeDecomposition::bridgeDifference(const Node_Id parent_id) {
 
     const Bag extra_in_parent_bag = setDifferrence(getBag(parent_id), getBag(child_id));
     const Bag extra_in_child_bag = setDifferrence(getBag(child_id), getBag(parent_id));
-    
+
     removeEdge(parent_id, child_id);
 
     Bag cur_bag = getBag(parent_id);
@@ -93,10 +130,11 @@ void TreeDecomposition::bridgeDifference(const Node_Id parent_id) {
     // Introduce nodes first (starting from the parent node)
     for (const Vertex_Id& v_id : extra_in_parent_bag) {
         cur_bag.erase(v_id);
-        if (cur_bag.size() == getBag(child_id).size())
+        if (cur_bag == getBag(child_id)) {
             break;
-
-        Node_Id new_n_id = addNode("new_" + std::to_string(new_nodes_counter++));
+        }
+        
+        Node_Id new_n_id = addNode();
         
         node_id_to_bag_contents[new_n_id] = cur_bag;
         addEdge(cur_n_id, new_n_id);
@@ -108,10 +146,10 @@ void TreeDecomposition::bridgeDifference(const Node_Id parent_id) {
     // Forget nodes second (starting from the parent node)
     for (const Vertex_Id& v_id : extra_in_child_bag) {
         cur_bag.insert(v_id);
-        if (cur_bag.size() == getBag(child_id).size())
+        if (cur_bag == getBag(child_id)) {
             break;
-
-        Node_Id new_n_id = addNode("new_" + std::to_string(new_nodes_counter++));
+        }
+        Node_Id new_n_id = addNode();
 
         node_id_to_bag_contents[new_n_id] = cur_bag;
         addEdge(cur_n_id, new_n_id);
@@ -123,10 +161,48 @@ void TreeDecomposition::bridgeDifference(const Node_Id parent_id) {
     addEdge(cur_n_id, child_id);
 }
 
-void TreeDecomposition::makeNJoinNodeNice(Node_Id parent_id) {
-    // std::vector<Node_Id> new_nodes;
-    // Node_Id last_node = n_id;
-    // TODO
+void TreeDecomposition::makeNJoinNodeNice(Node_Id cur_n_id) {
+    const std::vector<Node_Id> node_children{getChildrenOf(cur_n_id).begin(), getChildrenOf(cur_n_id).end()};
+    assert(node_children.size() >= 2);
+
+    for (Node_Id child_id : node_children) { // todo: remove assertion
+        assert(getBag(cur_n_id) != getBag(child_id));
+    }
+
+    std::vector<Node_Id> full_bag_nodes;
+    Node_Id prev_new_node = cur_n_id;
+    // Disconnect cur_n from its children
+    for (Node_Id child_id : node_children) {
+        removeEdge(cur_n_id, child_id);
+    }
+
+    // Create 2(!) new full bag nodes n-1 times where n is the number of children
+    // and append those nodes as children to the last_node (init=cur_n_id)
+    for (size_t i = 0; i < node_children.size() - 1; i++) {
+        Node_Id new_node_left = addNode();
+        Node_Id new_node_right = addNode();
+        setBag(new_node_left, getBag(cur_n_id));
+        setBag(new_node_right, getBag(cur_n_id));
+        addEdge(prev_new_node, new_node_left);
+        addEdge(prev_new_node, new_node_right);
+
+        full_bag_nodes.push_back(new_node_left);
+        prev_new_node = new_node_right;
+    }
+    full_bag_nodes.push_back(prev_new_node);
+    auto count = std::count_if(full_bag_nodes.begin(), full_bag_nodes.end(), [prev_new_node](Node_Id n_id) {return n_id == prev_new_node;});
+    assert(count == 1);
+
+    assert(node_children.size() == full_bag_nodes.size());
+
+    // Append the children to every full bag and bridge the difference to it
+    for (size_t i = 0; i < node_children.size(); i++) {
+        Node_Id full_bag_node = full_bag_nodes[i];
+        Node_Id child_id = node_children[i];
+
+        addEdge(full_bag_node, child_id);
+        bridgeDifference(full_bag_node);
+    }
 }
 
 bool TreeDecomposition::isValid() const {
@@ -286,7 +362,12 @@ const std::unordered_set<Node_Id>& TreeDecomposition::getChildrenOf(Node_Id n_id
     return children[n_id];
 }
 
-Node_Id TreeDecomposition::addNode(const std::string &n_name) {
+Node_Id TreeDecomposition::addNode() {
+    return addNode("NEW_" + std::to_string(new_nodes_counter++));
+}
+
+Node_Id TreeDecomposition::addNode(const std::string &n_name)
+{
     Node_Id new_id;
     if (!node_name_to_id.contains(n_name)) {
         new_id = next_free_id++;
@@ -372,6 +453,20 @@ void TreeDecomposition::doSomethingPreOrder(std::function<void(Node_Id)>f) const
 }
 
 void TreeDecomposition::doSomethingPreOrder(std::function<void(Node_Id)>f, Node_Id n_id) const {
+    f(n_id);
+    for (const Node_Id& child_id : children[n_id]) {
+        doSomethingPreOrder(f, child_id);
+    }
+}
+
+void TreeDecomposition::doWhilePreOrder(std::function<void(Node_Id)> f, std::function<bool()> pred) const {
+    doWhilePreOrder(f, pred, getRoot());
+}
+
+void TreeDecomposition::doWhilePreOrder(std::function<void(Node_Id)> f, std::function<bool()> pred, Node_Id n_id) const {
+    if (!pred())
+        return;
+
     f(n_id);
     for (const Node_Id& child_id : children[n_id]) {
         doSomethingPreOrder(f, child_id);

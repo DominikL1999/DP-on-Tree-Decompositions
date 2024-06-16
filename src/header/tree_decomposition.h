@@ -90,6 +90,8 @@ public:
 
     //// To make it a nice tree decomposition ////
 
+    bool isNiceTreeDecomposition() const;
+
     // Turns this tree decomposition into a nice tree decomposition.
     void turnIntoNiceTreeDecomposition();
 
@@ -107,11 +109,17 @@ public:
     
     void doSomethingPreOrder(std::function<void(Node_Id)>f, Node_Id n_id) const;
 
+    void doWhilePreOrder(std::function<void(Node_Id)>f, std::function<bool()>pred) const;
+
+    void doWhilePreOrder(std::function<void(Node_Id)>f, std::function<bool()>pred, Node_Id n_id) const;
+
     friend
     std::ostream& operator<<(std::ostream& stream, const TreeDecomposition& td);
 
 private:
     TreeDecomposition(const UndirectedGraph& graph) : graph_ptr(&graph) {}
+
+    Node_Id addNode();
 
     Node_Id addNode(const std::string& n_name);
     

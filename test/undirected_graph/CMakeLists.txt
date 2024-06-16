@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 set (TEST_FILES
-    test_parse_unsafe.cpp)
+    test_undirected_graph_parse_unsafe.cpp)
 
 string(REPLACE "${CMAKE_SOURCE_DIR}/" "" TestSuiteName "${CMAKE_CURRENT_SOURCE_DIR}")
 string(REPLACE "/" "_" TestSuiteName ${TestSuiteName})

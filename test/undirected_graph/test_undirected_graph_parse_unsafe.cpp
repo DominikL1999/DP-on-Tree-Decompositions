@@ -34,7 +34,7 @@ bool test_parse_unsafe_1() {
     return success;
 }
 
-int test_parse_unsafe(int argc, char** argv) {
+int test_undirected_graph_parse_unsafe(int argc, char** argv) {
     bool success = test_parse_unsafe_1();
     
     return !success;
