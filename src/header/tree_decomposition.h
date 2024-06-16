@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <unordered_set>
+#include <functional>
 #include <optional>
 
 using Node_Id = size_t;
@@ -40,6 +41,9 @@ class TreeDecomposition {
     std::optional<Node_Id> root={};
     std::vector<std::optional<Node_Id>> parents;
     std::vector<std::unordered_set<Node_Id>> children;
+
+    // To make it a nice tree decomposition:
+    size_t new_nodes_counter=0;
 
 public:
 
@@ -82,11 +86,26 @@ public:
 
     const std::vector<std::unordered_set<Node_Id>>& getChildren() const;
 
+    const std::unordered_set<Node_Id>& getChildrenOf(Node_Id n_id) const;
+
     //// To make it a nice tree decomposition ////
 
+    // Turns this tree decomposition into a nice tree decomposition.
     void turnIntoNiceTreeDecomposition();
 
-    void makeNJoinNodeNice(Node_Id n_id);
+    // Given the id of a node with exactly one child, fills the space between it and its child such that every node in between is either an introduce node or a forget node.
+    void bridgeDifference(Node_Id parent_id);
+
+    // Given the id of a node with more than one child, fills the space between it and its children such that every node in between is either a join node or an introduce node or a forget node.
+    void makeNJoinNodeNice(Node_Id parent_id);
+
+    std::string printBag(const Bag& bag) const;
+
+    std::string printChildren(Node_Id n_id) const;
+
+    void doSomethingPreOrder(std::function<void(Node_Id)>f) const;
+    
+    void doSomethingPreOrder(std::function<void(Node_Id)>f, Node_Id n_id) const;
 
     friend
     std::ostream& operator<<(std::ostream& stream, const TreeDecomposition& td);
@@ -100,5 +119,7 @@ private:
 
     void removeEdge(Node_Id n1_id, Node_Id n2_id);
 
-    void setBag(Node_Id n_id, Bag&& bag_content);
+    void setBag(Node_Id n_id, const Bag& bag_content); // copy bag
+
+    void setBag(Node_Id n_id, Bag&& bag_content); // move existing bag
 };
