@@ -7,7 +7,7 @@
 #include <optional>
 
 using Node_Id = size_t;
-using TreeDecompositionAdjacencies = std::vector<std::vector<Node_Id>>;
+using TreeDecompositionAdjacencies = std::vector<std::unordered_set<Node_Id>>;
 using Bag = std::unordered_set<Vertex_Id>;
 using TD_Edge = std::pair<Node_Id, Node_Id>;
 
@@ -39,7 +39,7 @@ class TreeDecomposition {
     // To root tree:
     std::optional<Node_Id> root={};
     std::vector<std::optional<Node_Id>> parents;
-    std::vector<std::vector<Node_Id>> children;
+    std::vector<std::unordered_set<Node_Id>> children;
 
 public:
 
@@ -54,7 +54,7 @@ public:
 
     bool areNeighbours(Node_Id n_id1, Node_Id n_id2) const;
 
-    const std::vector<Node_Id>& getNeighbours(Node_Id n_id) const;
+    const std::unordered_set<Node_Id>& getNeighbours(Node_Id n_id) const;
 
     std::string idToName(Node_Id n_id) const;
 
@@ -80,7 +80,7 @@ public:
 
     const std::vector<std::optional<Node_Id>>& getParents() const;
 
-    const std::vector<std::vector<Node_Id>>& getChildren() const;
+    const std::vector<std::unordered_set<Node_Id>>& getChildren() const;
 
     //// To make it a nice tree decomposition ////
 
