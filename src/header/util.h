@@ -24,6 +24,37 @@ bool contains(const std::unordered_set<T>& set, const T& elem) {
 }
 
 template<typename T>
+std::unordered_set<T> setDifferrence(const std::unordered_set<T>& s1, const std::unordered_set<T>& s2) {
+    std::unordered_set<T> result_set;
+    for (const T& elem : s1)
+        if (!contains(s2, elem))
+            result_set.insert(elem);
+    
+    return result_set;
+}
+
+template<typename T>
+std::unordered_set<T> setUnion(const std::unordered_set<T>& s1, const std::unordered_set<T>& s2) {
+    std::unordered_set<T> result_set;
+    for (const T& elem : s1)
+        result_set.insert(elem);
+    for (const T& elem : s2)
+        result_set.insert(elem);
+    
+    return result_set;
+}
+
+template<typename T>
+std::unordered_set<T> setIntersect(const std::unordered_set<T>& s1, const std::unordered_set<T>& s2) {
+    std::unordered_set<T> result_set;
+    for (const T& elem : s1)
+        if (contains(s2, elem))
+            result_set.insert(elem);
+    
+    return result_set;
+}
+
+template<typename T>
 bool setEqual(const std::vector<T>& vec1, const std::vector<T>& vec2) {
     return std::all_of(vec1.begin(), vec1.end(), [&vec2](const T& x){return contains(vec2, x);}) &&
         std::all_of(vec2.begin(), vec2.end(), [&vec1](const T& x){return contains(vec1, x);});

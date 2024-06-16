@@ -4,7 +4,7 @@ set (TEST_FILES
     test_ends_with.cpp;
     test_filter.cpp;
     test_map.cpp;
-    test_set_equal.cpp;
+    test_set.cpp;
     test_string_split.cpp;
     test_strip_to_filename.cpp)
 
