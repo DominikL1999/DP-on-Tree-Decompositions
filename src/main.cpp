@@ -39,16 +39,9 @@ int main(int argc, char* argv[]) {
 
     UndirectedGraph graph = UndirectedGraph::parseUnsafe(input_path);
     TreeDecomposition td = TreeDecomposition::parseUnsafe(td_input_path, graph);
-    cout << "td: " << td << endl;
-    cout << "td.isValid(): " << td.isValid() << endl;
 
     td.rootTree();
-    cout << "Number of nodes in input tree decomposition: " << td.getAllNodeIds().size() << endl;
-    td.removeDuplicateNeighbours();
-    cout << "Number of nodes after removing duplicates: " << td.getAllNodeIds().size() << endl;
     td.turnIntoNiceTreeDecomposition();
-    cout << "Done turning it into a nice tree decomposition." << endl;
-    cout << "Number of nodes after turning it into a nice tree decomposition: " << td.getAllNodeIds().size() << endl;
-    cout << "Is the result tree decomposition valid?: " << td.isValid() << endl;
-    cout << "Is the resulting tree decomposition nice?: " << td.isNiceTreeDecomposition() << endl;
+    cout << "Is the result tree decomposition valid? - " << td.isValid() << endl;
+    cout << "Is the resulting tree decomposition nice? - " << td.isNiceTreeDecomposition() << endl;
 }

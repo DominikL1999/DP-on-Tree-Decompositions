@@ -107,29 +107,12 @@ bool TreeDecomposition::isNiceTreeDecomposition() const
 
 void TreeDecomposition::turnIntoNiceTreeDecomposition() {
     assert(isRooted());
-    removeDuplicateNeighbours();
     turnIntoNiceTreeDecomposition(getRoot());
 }
 
 void TreeDecomposition::turnIntoNiceTreeDecomposition(Node_Id n_id) {
-    const auto& node = nodes.at(n_id);
-    // for (Node_Id child_id : node.children) {
-    //     const auto& child = nodes.at(child_id);
-    //     assert(node.bag != child.bag);
-    // }
-
-    if (node.children.size() == 1) {
-        Node_Id child_id = *node.children.begin();
-        bridgeDifference(n_id);
-        turnIntoNiceTreeDecomposition(child_id);
-    }
-    else if (node.children.size() >= 2) {
-        std::vector<Node_Id> node_children{node.children.begin(), node.children.end()};
-        makeNJoinNodeNice(n_id);
-        for (Node_Id child_id : node_children) {
-            turnIntoNiceTreeDecomposition(child_id);
-        }
-    }
+    removeDuplicateNeighbours();
+    turnIntoNiceTreeDecomposition_Rec(n_id);
 }
 
 void TreeDecomposition::makeNodeNice(Node_Id n_id) {
@@ -417,7 +400,7 @@ void TreeDecomposition::removeDuplicateNeighbours() {
         // 1. Remove all edges incident to the child
         // 2. Add all former children to the children of this node.
         // 3. Delete the child.
-        const auto& node = nodes.at(n_id);
+        const auto node = nodes.at(n_id);
         std::vector<Node_Id>node_children{node.children.begin(), node.children.end()};
         for (Node_Id child_id : node_children) {
             const auto& child = nodes.at(child_id);
@@ -436,7 +419,25 @@ const Node_Attributes &TreeDecomposition::getNode(Node_Id n_id) const {
     return nodes.at(n_id);
 }
 
-Node_Id TreeDecomposition::addNode() {
+void TreeDecomposition::turnIntoNiceTreeDecomposition_Rec(Node_Id n_id) {
+    const auto& node = nodes.at(n_id);
+
+    if (node.children.size() == 1) {
+        Node_Id child_id = *node.children.begin();
+        bridgeDifference(n_id);
+        turnIntoNiceTreeDecomposition_Rec(child_id);
+    }
+    else if (node.children.size() >= 2) {
+        std::vector<Node_Id> node_children{node.children.begin(), node.children.end()};
+        makeNJoinNodeNice(n_id);
+        for (Node_Id child_id : node_children) {
+            turnIntoNiceTreeDecomposition_Rec(child_id);
+        }
+    }
+}
+
+Node_Id TreeDecomposition::addNode()
+{
     return addNode("NEW_" + std::to_string(new_nodes_counter++));
 }
 
@@ -546,9 +547,9 @@ void TreeDecomposition::doSomethingPostOrder(std::function<void(Node_Id)>f) cons
 }
 
 void TreeDecomposition::doSomethingPostOrder(std::function<void(Node_Id)>f, Node_Id n_id) const {
-    const auto& node = nodes.at(n_id);
+    const auto node = nodes.at(n_id);
     const std::vector<Node_Id> children_copy{node.children.begin(), node.children.end()};
-    for (const Node_Id& child_id : children_copy) {
+    for (const Node_Id child_id : children_copy) {
         doSomethingPostOrder(f, child_id);
     }
     f(n_id);

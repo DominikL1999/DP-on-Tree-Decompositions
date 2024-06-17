@@ -125,6 +125,8 @@ private:
 
     TreeDecomposition(const UndirectedGraph& graph) : graph_ptr(&graph) {}
 
+    void turnIntoNiceTreeDecomposition_Rec(Node_Id n_id);
+
     Node_Id addNode();
 
     Node_Id addNode(const std::string& n_name);
