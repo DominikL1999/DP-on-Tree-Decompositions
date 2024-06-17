@@ -22,10 +22,10 @@ bool test_parse_unsafe_1() {
     success &= returnAndOutputOnFailure(false, td.areNeighbours(n2_id, n4_id));
 
     // Check bag contents
-    success &= returnAndOutputOnFailure({graph.nameToId("a"), graph.nameToId("b"), graph.nameToId("c")}, td.getBag(n1_id));
-    success &= returnAndOutputOnFailure({graph.nameToId("a"), graph.nameToId("c"), graph.nameToId("d")}, td.getBag(n2_id));
-    success &= returnAndOutputOnFailure({graph.nameToId("a"), graph.nameToId("d"), graph.nameToId("e")}, td.getBag(n3_id));
-    success &= returnAndOutputOnFailure({graph.nameToId("a"), graph.nameToId("e"), graph.nameToId("f")}, td.getBag(n4_id));
+    success &= returnAndOutputOnFailure({graph.nameToId("a"), graph.nameToId("b"), graph.nameToId("c")}, td.getNode(n1_id).bag);
+    success &= returnAndOutputOnFailure({graph.nameToId("a"), graph.nameToId("c"), graph.nameToId("d")}, td.getNode(n2_id).bag);
+    success &= returnAndOutputOnFailure({graph.nameToId("a"), graph.nameToId("d"), graph.nameToId("e")}, td.getNode(n3_id).bag);
+    success &= returnAndOutputOnFailure({graph.nameToId("a"), graph.nameToId("e"), graph.nameToId("f")}, td.getNode(n4_id).bag);
 
     return success;
 }

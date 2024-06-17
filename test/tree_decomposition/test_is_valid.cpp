@@ -5,10 +5,14 @@
 #include <cassert>
 #include <filesystem>
 
+using std::cout;
+using std::endl;
+
 bool test_is_valid_valid_td() {
     UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/cycle.gr.csv");
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/cycle.td.csv", graph);
-    assert(!td.getNodes().empty());
+
+    cout << "td: " << td << endl;
 
     return td.isValid();
 }
@@ -16,7 +20,6 @@ bool test_is_valid_valid_td() {
 bool test_is_valid_vertex_missing() {
     UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/cycle.gr.csv");
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/cycle_vertex_missing.td.csv", graph);
-    assert(!td.getNodes().empty());
 
     return !td.isValid();
 }
@@ -24,7 +27,6 @@ bool test_is_valid_vertex_missing() {
 bool test_is_valid_edge_missing() {
     UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/cycle.gr.csv");
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/cycle_edge_missing.td.csv", graph);
-    assert(!td.getNodes().empty());
 
     return !td.isValid();
 }
@@ -32,7 +34,6 @@ bool test_is_valid_edge_missing() {
 bool test_is_valid_subtree_disconnected() {
     UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/cycle.gr.csv");
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/cycle_subtree_disconnected.td.csv", graph);
-    assert(!td.getNodes().empty());
 
     return !td.isValid();
 }
@@ -56,7 +57,6 @@ bool test_is_valid_large_graphs() {
 
         UndirectedGraph graph = UndirectedGraph::parseUnsafe(graph_path);
         TreeDecomposition td = TreeDecomposition::parseUnsafe(td_path, graph);
-        assert(!td.getNodes().empty());
         
         bool success = td.isValid();
         if (!success)
@@ -69,9 +69,9 @@ int test_is_valid(int argc, char** argv) {
     bool success = true;
     
     success &= test_is_valid_valid_td();
-    // success &= test_is_valid_vertex_missing();
-    // success &= test_is_valid_edge_missing();
-    // success &= test_is_valid_subtree_disconnected();
+    success &= test_is_valid_vertex_missing();
+    success &= test_is_valid_edge_missing();
+    success &= test_is_valid_subtree_disconnected();
     // success &= test_is_valid_large_graphs(); // this takes a long time (3 seconds total, but still.)
 
     return !success;

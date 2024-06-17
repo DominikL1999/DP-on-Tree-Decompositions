@@ -39,12 +39,11 @@ int main(int argc, char* argv[]) {
 
     UndirectedGraph graph = UndirectedGraph::parseUnsafe(input_path);
     TreeDecomposition td = TreeDecomposition::parseUnsafe(td_input_path, graph);
-    assert(!td.getNodes().empty());
-    assert(td.isValid());
+    cout << "td: " << td << endl;
+    cout << "td.isValid(): " << td.isValid() << endl;
 
-    td.rootTree(td.nameToId("N1"));
-    td.makeNJoinNodeNice(td.nameToId("N1"));
-    cout << "=====================================" << endl;
-    cout << "td:" << td << endl;
-    cout << "isNiceTreeDecomposition: " << td.isNiceTreeDecomposition() << endl;
+    // td.rootTree(td.nameToId("N1"));
+    // cout << "=====================================" << endl;
+    // cout << "td:" << td << endl;
+    // cout << "isNiceTreeDecomposition: " << td.isNiceTreeDecomposition() << endl;
 }

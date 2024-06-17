@@ -89,6 +89,17 @@ std::vector<T> filter(const std::vector<T>& vec, std::function<bool(T)>f) {
     return vec2;
 }
 
+template<typename T>
+std::unordered_set<T> filter(const std::unordered_set<T>& set, std::function<bool(T)>f) {
+    std::unordered_set<T> set2;
+    for (const T& elem : set) {
+        if (f(elem))
+            set2.insert(elem);
+    }
+
+    return set2;
+}
+
 //// Unit testing utilities ////
 
 template<typename T>

@@ -47,7 +47,7 @@ TreeDecomposition TreeDecomposition::parseUnsafe(const std::string &input_path, 
             for (const string& v_name : bag_contents_names) {
                 bag.insert(graph.nameToId(v_name));
             }
-            td.setBag(n_id, std::move(bag));
+            td.nodes[n_id].bag = bag;
             td.treewidth = std::max(td.treewidth, bag_contents_names.size() - 1);
         }
         else {
@@ -71,34 +71,32 @@ How to get a nice tree decomposition:
 - Between any two (connected) nodes, "subdivide" their difference into multiple nodes.
 - Let C be the set of children of a node n with bag B. If |C| >= 2, create a chain of nodes each with bag B the size of |C| - 2 and append it to n. Add n and all created nodes to "root_nodes". Assert(|root_nodes| == |C| - 1). The last node added should be added twice.
 */
-bool TreeDecomposition::isNiceTreeDecomposition() const {
-    if (!isValid())
-        return false;
 
-    if (!isRooted())
-        return false;
+bool TreeDecomposition::isNiceTreeDecomposition() const
+{
+    assert(isValid());
+    assert(isRooted());
     
     bool is_valid = true;
     doWhilePreOrder([this, &is_valid](const Node_Id& n_id) {
-        auto& node_children = getChildrenOf(n_id);
-        const Bag& n_bag = getBag(n_id);
-        if (node_children.size() == 0) {
+        const auto& node = nodes.at(n_id);
+        if (node.children.size() == 0) {
             return;
         }
-        else if (node_children.size() == 1) {
-            Node_Id child_id = *node_children.begin();
-            const Bag& child_bag = getBag(child_id);
-            size_t diff1 = setDifferrence(n_bag, child_bag).size();
-            size_t diff2 = setDifferrence(child_bag, n_bag).size();
+        else if (node.children.size() == 1) {
+            Node_Id child_id = *node.children.begin();
+            const auto& child = nodes.at(child_id);
+            size_t diff1 = setDifferrence(node.bag, child.bag).size();
+            size_t diff2 = setDifferrence(child.bag, node.bag).size();
             if (!(diff1 == 0 && diff2 == 1 || diff1 == 1 && diff2 == 0)) {
                 is_valid = false;
             }
             return;
         }
 
-        for (const Node_Id& child_id : node_children) {
-            const Bag& child_bag = getBag(child_id);
-            if (child_bag != n_bag) {
+        for (const Node_Id& child_id : node.children) {
+            const auto& child = nodes.at(child_id);
+            if (child.bag != node.bag) {
                 is_valid = false;
                 return;
             }
@@ -109,64 +107,97 @@ bool TreeDecomposition::isNiceTreeDecomposition() const {
 }
 
 void TreeDecomposition::turnIntoNiceTreeDecomposition() {
+    assert(isRooted());
+    turnIntoNiceTreeDecomposition(getRoot());
+}
+
+void TreeDecomposition::turnIntoNiceTreeDecomposition(Node_Id n_id) {
+    const auto& node = nodes.at(n_id);
+    for (Node_Id child_id : node.children) {
+        const auto& child = nodes.at(child_id);
+        assert(node.bag != child.bag);
+    }
+
+    if (node.children.size() == 1) {
+        Node_Id child_id = *node.children.begin();
+        bridgeDifference(n_id);
+        turnIntoNiceTreeDecomposition(child_id);
+    }
+    else if (node.children.size() >= 2) {
+        std::vector<Node_Id> node_children{node.children.begin(), node.children.end()};
+        makeNJoinNodeNice(n_id);
+        for (Node_Id child_id : node_children) {
+            turnIntoNiceTreeDecomposition(child_id);
+        }
+    }
+}
+
+void TreeDecomposition::makeNodeNice(Node_Id n_id) {
+    const auto& node = nodes.at(n_id);
+    if (node.children.size() == 1)
+        bridgeDifference(n_id);
+    else if (node.children.size() >= 2)
+        makeNJoinNodeNice(n_id);
 }
 
 void TreeDecomposition::bridgeDifference(const Node_Id parent_id) {
+    const auto& parent_node = nodes.at(parent_id);
+    assert(nodes[parent_id].children.size() == 1);
 
-    const auto& children = getChildren();
-    assert(children[parent_id].size() == 1);
+    Node_Id child_id = *parent_node.children.begin();
+    const auto& child_node = nodes.at(child_id);
 
-    Node_Id child_id = *children[parent_id].begin();
-
-    const Bag extra_in_parent_bag = setDifferrence(getBag(parent_id), getBag(child_id));
-    const Bag extra_in_child_bag = setDifferrence(getBag(child_id), getBag(parent_id));
+    const Bag extra_in_parent_bag = setDifferrence(parent_node.bag, child_node.bag);
+    const Bag extra_in_child_bag = setDifferrence(child_node.bag, parent_node.bag);
 
     removeEdge(parent_id, child_id);
 
-    Bag cur_bag = getBag(parent_id);
+    Bag cur_bag = parent_node.bag;
     Node_Id cur_n_id = parent_id;
 
-    assert(cur_bag == node_id_to_bag_contents.at(cur_n_id)); // invariant
+    assert(cur_bag == nodes[cur_n_id].bag); // invariant
     // Introduce nodes first (starting from the parent node)
     for (const Vertex_Id& v_id : extra_in_parent_bag) {
         cur_bag.erase(v_id);
-        if (cur_bag == getBag(child_id)) {
+        if (cur_bag == child_node.bag) {
             break;
         }
         
         Node_Id new_n_id = addNode();
         
-        node_id_to_bag_contents[new_n_id] = cur_bag;
+        nodes[new_n_id].bag = cur_bag;
         addEdge(cur_n_id, new_n_id);
 
         cur_n_id = new_n_id; // cur_bag is already updated
-        assert(cur_bag == node_id_to_bag_contents.at(cur_n_id)); // invariant
+        assert(cur_bag == nodes[cur_n_id].bag);
     }
 
     // Forget nodes second (starting from the parent node)
     for (const Vertex_Id& v_id : extra_in_child_bag) {
         cur_bag.insert(v_id);
-        if (cur_bag == getBag(child_id)) {
+        if (cur_bag == child_node.bag) {
             break;
         }
         Node_Id new_n_id = addNode();
 
-        node_id_to_bag_contents[new_n_id] = cur_bag;
+        nodes[new_n_id].bag = cur_bag;
         addEdge(cur_n_id, new_n_id);
 
         cur_n_id = new_n_id; // cur_bag is already updated
-        assert(cur_bag == node_id_to_bag_contents.at(cur_n_id)); // invariant
+        assert(cur_bag == nodes[cur_n_id].bag);
     }
 
     addEdge(cur_n_id, child_id);
 }
 
 void TreeDecomposition::makeNJoinNodeNice(Node_Id cur_n_id) {
-    const std::vector<Node_Id> node_children{getChildrenOf(cur_n_id).begin(), getChildrenOf(cur_n_id).end()};
+    const auto& cur_node = nodes[cur_n_id];
+    const std::vector<Node_Id> node_children{cur_node.children.begin(), cur_node.children.end()};
     assert(node_children.size() >= 2);
 
     for (Node_Id child_id : node_children) { // todo: remove assertion
-        assert(getBag(cur_n_id) != getBag(child_id));
+        const auto& child = nodes.at(child_id);
+        assert(cur_node.bag != child.bag);
     }
 
     std::vector<Node_Id> full_bag_nodes;
@@ -181,8 +212,8 @@ void TreeDecomposition::makeNJoinNodeNice(Node_Id cur_n_id) {
     for (size_t i = 0; i < node_children.size() - 1; i++) {
         Node_Id new_node_left = addNode();
         Node_Id new_node_right = addNode();
-        setBag(new_node_left, getBag(cur_n_id));
-        setBag(new_node_right, getBag(cur_n_id));
+        nodes[new_node_left].bag = cur_node.bag;
+        nodes[new_node_right].bag = cur_node.bag;
         addEdge(prev_new_node, new_node_left);
         addEdge(prev_new_node, new_node_right);
 
@@ -205,53 +236,79 @@ void TreeDecomposition::makeNJoinNodeNice(Node_Id cur_n_id) {
     }
 }
 
+std::string TreeDecomposition::printNodes(const std::vector<Node_Id>& n_ids) const {
+    std::string str = "";
+    for (auto n_id : n_ids) {
+        str += idToName(n_id) + " ";
+    }
+    return str;
+}
+
 bool TreeDecomposition::isValid() const {
     // Property 1: Every vertex appears in some bag
     const std::vector<Vertex_Id> vertices = graph_ptr->getVertices();
-    bool success = std::all_of(vertices.begin(), vertices.end(), [this](const Vertex_Id& v_id){
-        return std::any_of(nodes.begin(), nodes.end(), [this, v_id](const Node_Id& n_id){
-            return contains(getBag(n_id), v_id);
-        });
-    });
-    if (!success) {
-        return false;
+
+    for (auto& v_id : vertices) {
+        bool found = false;
+        for (const auto& n_pair : nodes) {
+            if (n_pair.second.bag.contains(v_id)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            return false;
     }
 
     // Property 2: Every edge appears in some bag
     const std::vector<Edge>& edges = graph_ptr->getEdges();
-    success = std::all_of(edges.begin(), edges.end(), [this](const Edge& edge){
-        return std::any_of(getBags().begin(), getBags().end(), [&edge](const Bag& bag){
-            return contains(bag, edge.first) && contains(bag, edge.second);
-        });
+    bool success = std::all_of(edges.begin(), edges.end(), [this](const Edge& edge){
+        for (const std::pair<Node_Id, Node_Attributes>& node_pair : nodes) {
+            if (contains(node_pair.second.bag, edge.first) && contains(node_pair.second.bag, edge.second))
+                return true;
+        }
+        return false;
     });
     if (!success) {
         return false;
     }
 
     // Property 3: For every vertex v, the subtree containing vertex v in its bags is connected.
-    success = std::all_of(vertices.begin(), vertices.end(), [this](const Vertex_Id v_id){
-        std::vector<Node_Id> visited;
+    success = std::all_of(vertices.begin(), vertices.end(), [this](const Vertex_Id v_id) {
+        std::unordered_set<Node_Id> visited;
         std::stack<Node_Id> to_visit;
-        auto it = std::find_if(getNodes().begin(), getNodes().end(), [this,v_id](const Node_Id& n_id){return contains(getBag(n_id), v_id);});
-        assert(it != getNodes().end());
-        to_visit.push(*it);
+        bool found = false;
+        Node_Id start;
+        for (const auto& n_pair : nodes) {
+            if (n_pair.second.bag.contains(v_id)) {
+                found = true;
+                start = n_pair.first;
+                break;
+            }
+        }
+        assert(found);
+        to_visit.push(start);
+        assert(nodes.at(start).bag.contains(v_id));
         while (!to_visit.empty()) {
             Node_Id cur_n_id = to_visit.top();
+            const auto& node = nodes.at(cur_n_id);
             to_visit.pop();
-            visited.push_back(cur_n_id);
-            const std::unordered_set<Node_Id>& neighbours = getNeighbours(cur_n_id);
-            for (const Node_Id& n_id : neighbours) {
-                if (contains(visited, n_id) || (!contains(getBag(n_id), v_id)))
-                    continue;
-                else {
+            visited.insert(cur_n_id);
+            for (const Node_Id& n_id : node.neighbours) {
+                if (!(visited.contains(n_id)) && nodes.at(n_id).bag.contains(v_id)) {
                     to_visit.push(n_id);
                 }
             }
         }
 
-        auto filtered = filter<Node_Id>(nodes, [this, v_id](Node_Id n_id){return contains(getBag(n_id), v_id);});
-        return setEqual(visited, filter<Node_Id>(nodes, [this, v_id](Node_Id n_id){return contains(getBag(n_id), v_id);}));
+        std::unordered_set<Node_Id>compare;
+        for (const auto& node : nodes) {
+            if (node.second.bag.contains(v_id))
+                compare.insert(node.first);
+        }
+        return visited == compare;
     });
+    
     if (!success) {
         return false;
     }
@@ -259,38 +316,20 @@ bool TreeDecomposition::isValid() const {
     return true;
 }
 
-const std::vector<Node_Id>& TreeDecomposition::getNodes() const {
-    return nodes;
-}
-
 const std::unordered_set<TD_Edge>& TreeDecomposition::getEdges() const {
     return edges;
 }
 
 bool TreeDecomposition::areNeighbours(Node_Id n_id1, Node_Id n_id2) const {
-    return contains(adjacencies[n_id1], n_id2);
+    return nodes.at(n_id1).neighbours.contains(n_id2);
 }
 
-const std::unordered_set<Node_Id>& TreeDecomposition::getNeighbours(Node_Id n_id) const {
-    return adjacencies.at(n_id);
+std::string TreeDecomposition::idToName(Node_Id n_id) const {
+    return nodes.at(n_id).name;
 }
 
-std::string TreeDecomposition::idToName(Node_Id n_id) const
-{
-    return node_id_to_name.at(n_id);
-}
-
-Node_Id TreeDecomposition::nameToId(const std::string& name) const
-{
+Node_Id TreeDecomposition::nameToId(const std::string& name) const {
     return node_name_to_id.at(name);
-}
-
-const Bag& TreeDecomposition::getBag(Node_Id n_id) const {
-    return node_id_to_bag_contents[n_id];
-}
-
-const std::vector<Bag>& TreeDecomposition::getBags() const {
-    return node_id_to_bag_contents;
 }
 
 size_t TreeDecomposition::getTreewidth() const {
@@ -308,21 +347,24 @@ const Node_Id& TreeDecomposition::getRoot() const {
 
 Node_Id TreeDecomposition::rootTree() {
     assert(!nodes.empty());
-    Node_Id node_with_largest_bag = *std::max_element(nodes.begin(), nodes.end(), [this](Node_Id n1_id, Node_Id n2_id) {
-        return getBag(n1_id).size() <= getBag(n2_id).size();
+    assert(!isRooted());
+
+    auto it = nodes.begin();
+    for (const auto& n_pair : nodes) {
+
+    }
+    auto node_with_largest_bag = std::max_element(nodes.begin(), nodes.end(), [](const auto& node1, const auto& node2) {
+        return node1.second.bag.size() <= node2.second.bag.size();
     });
 
-    rootTree(node_with_largest_bag);
+    rootTree(node_with_largest_bag->first);
     assert(isRooted());
 
-    return node_with_largest_bag;
+    return node_with_largest_bag->first;
 }
 
 void TreeDecomposition::rootTree(Node_Id designated_root) {
-    parents.clear();
-    children.clear();
-    parents.resize(nodes.size());
-    children.resize(nodes.size());
+    assert(!isRooted());
 
     std::vector<bool> visited(nodes.size(), false);
 
@@ -331,16 +373,17 @@ void TreeDecomposition::rootTree(Node_Id designated_root) {
 
     while (!to_visit.empty()) {
         Node_Id cur_n_id = to_visit.top();
+        Node_Attributes& cur_node = nodes[cur_n_id];
         to_visit.pop();
         visited[cur_n_id] = true;
-        const std::unordered_set<Node_Id>& neighbours = getNeighbours(cur_n_id);
+        const std::unordered_set<Node_Id>& neighbours = cur_node.neighbours;
         
         for (const Node_Id& neighbour : neighbours) {
             if (visited[neighbour])
                 continue; // has been visited already
             else {
-                parents[neighbour] = cur_n_id;
-                children[cur_n_id].insert(neighbour);
+                nodes[neighbour].parent = cur_n_id;
+                cur_node.children.insert(neighbour);
                 to_visit.push(neighbour);
             }
         }
@@ -350,16 +393,8 @@ void TreeDecomposition::rootTree(Node_Id designated_root) {
     assert(isRooted());
 }
 
-const std::vector<std::optional<Node_Id>>& TreeDecomposition::getParents() const {
-    return parents;
-}
-
-const std::vector<std::unordered_set<Node_Id>>& TreeDecomposition::getChildren() const {
-    return children;
-}
-
-const std::unordered_set<Node_Id>& TreeDecomposition::getChildrenOf(Node_Id n_id) const {
-    return children[n_id];
+const Node_Attributes& TreeDecomposition::getNode(Node_Id n_id) const {
+    return nodes.at(n_id);
 }
 
 Node_Id TreeDecomposition::addNode() {
@@ -370,16 +405,13 @@ Node_Id TreeDecomposition::addNode(const std::string &n_name)
 {
     Node_Id new_id;
     if (!node_name_to_id.contains(n_name)) {
+        Node_Attributes new_node;
+        new_node.name = n_name;
         new_id = next_free_id++;
-        nodes.push_back(new_id);
-        adjacencies.push_back({});
-
-        node_id_to_name.push_back(n_name);
-        node_id_to_bag_contents.push_back({});
+        
         node_name_to_id.insert({n_name, new_id});
 
-        parents.push_back({});
-        children.push_back({});
+        nodes.insert({new_id, new_node});
     }
     else {
         new_id = node_name_to_id.at(n_name);
@@ -390,20 +422,28 @@ Node_Id TreeDecomposition::addNode(const std::string &n_name)
     return new_id;
 }
 
+Node_Id TreeDecomposition::removeNode(Node_Id n_id) {
+    assert(nodes.contains(n_id));
+
+    nodes.erase(n_id);
+
+    return -1;
+}
+
 void TreeDecomposition::addEdge(Node_Id n1_id, Node_Id n2_id) {
     assert(!areNeighbours(n1_id, n2_id));
 
     // Add edge in adjacencies
-    adjacencies[n1_id].insert(n2_id);
-    adjacencies[n2_id].insert(n1_id);
+    nodes[n1_id].neighbours.insert(n2_id);
+    nodes[n2_id].neighbours.insert(n1_id);
 
     // Add edge in edges
     edges.insert({std::min(n1_id, n2_id), std::max(n1_id, n2_id)});
 
     // If tree is rooted: Add edge in parents and children
     if (isRooted()) {
-        parents[n2_id] = n1_id;
-        children[n1_id].insert(n2_id);
+        nodes[n2_id].parent = n1_id;
+        nodes[n1_id].children.insert(n2_id);
     }
 }
 
@@ -411,25 +451,17 @@ void TreeDecomposition::removeEdge(Node_Id n1_id, Node_Id n2_id) {
     assert(areNeighbours(n1_id, n2_id));
 
     // Remove edge in adjacencies
-    adjacencies[n1_id].erase(n2_id);
-    adjacencies[n2_id].erase(n1_id);
+    nodes[n1_id].neighbours.erase(n2_id);
+    nodes[n2_id].neighbours.erase(n1_id);
 
     // Remove edge in edges
     edges.erase({std::min(n1_id, n2_id), std::max(n1_id, n2_id)});
 
     // If tree is rooted: Remove edge in parents and children
     if (isRooted()) {
-        parents[n2_id] = {};
-        children[n1_id].erase(n2_id);
+        nodes[n2_id].parent = {};
+        nodes[n1_id].children.erase(n2_id);
     }
-}
-
-void TreeDecomposition::setBag(Node_Id n_id, const Bag &bag_content) {
-    node_id_to_bag_contents[n_id] = bag_content;
-}
-
-void TreeDecomposition::setBag(Node_Id n_id, Bag&& bag_content) {
-    std::swap(node_id_to_bag_contents[n_id], bag_content);
 }
 
 string TreeDecomposition::printBag(const Bag& bag) const {
@@ -442,7 +474,8 @@ string TreeDecomposition::printBag(const Bag& bag) const {
 
 string TreeDecomposition::printChildren(Node_Id n_id) const {
     string result_str = "";
-    for (const Node_Id& child_id : children[n_id]) {
+    const auto& node = nodes.at(n_id);
+    for (const Node_Id& child_id : node.children) {
         result_str += idToName(child_id) + " ";
     }
     return result_str;
@@ -454,7 +487,9 @@ void TreeDecomposition::doSomethingPreOrder(std::function<void(Node_Id)>f) const
 
 void TreeDecomposition::doSomethingPreOrder(std::function<void(Node_Id)>f, Node_Id n_id) const {
     f(n_id);
-    for (const Node_Id& child_id : children[n_id]) {
+    const auto& node = nodes.at(n_id);
+    const std::vector<Node_Id> children_copy{node.children.begin(), node.children.end()};
+    for (const Node_Id& child_id : children_copy) {
         doSomethingPreOrder(f, child_id);
     }
 }
@@ -468,7 +503,7 @@ void TreeDecomposition::doWhilePreOrder(std::function<void(Node_Id)> f, std::fun
         return;
 
     f(n_id);
-    for (const Node_Id& child_id : children[n_id]) {
+    for (const Node_Id& child_id : nodes.at(n_id).children) {
         doSomethingPreOrder(f, child_id);
     }
 }
@@ -479,22 +514,24 @@ std::ostream &operator<<(std::ostream &stream, const TreeDecomposition &td)
         stream << "Nodes (in pre-order):" << std::endl;
         td.doSomethingPreOrder([&stream, &td](const Node_Id& n_id) {
             // print node name, bag content, child names
-            const std::unordered_set<Node_Id>& children = td.getChildrenOf(n_id);
+            const auto& node = td.getNode(n_id);
+            // const std::unordered_set<Node_Id>& children = td.getChildren(n_id);
             std::vector<std::string> children_names;
-            for (const Node_Id child_id : children)
+            for (const Node_Id child_id : node.children)
                 children_names.push_back(td.idToName(child_id));
             std::vector<std::string> bag_names;
-            for (const Vertex_Id v_id : td.getBag(n_id))
+            for (const Vertex_Id v_id : node.bag)
                 bag_names.push_back(td.graph_ptr->idToName(v_id));
             stream << td.idToName(n_id) << ": " << bag_names << ". Children: " << children_names << std::endl;
         });
     }
     else {
-        stream << "Tree Decomposition with " << td.getNodes().size() << " nodes. Those nodes are:" << std::endl;
-        for (const Node_Id n_id : td.getNodes()) {
-            const Bag& bag = td.getBag(n_id);
+        stream << "Tree Decomposition with " << td.nodes.size() << " nodes. Those nodes are:" << std::endl;
+        for (const auto& n_pair : td.nodes) {
+            Node_Id n_id = n_pair.first;
+            const auto& node = td.getNode(n_id);
             stream << td.idToName(n_id) << ": ";
-            for (const Vertex_Id& v_id : bag) {
+            for (const Vertex_Id& v_id : node.bag) {
                 stream << td.graph_ptr->idToName(v_id) << " ";
             }
             stream << std::endl;

@@ -23,28 +23,17 @@ struct std::hash<TD_Edge>
     }
 };
 
+class Node_Attributes {
+public:
+    std::unordered_set<Node_Id> neighbours;
+    std::string name;
+    Bag bag;
+    std::optional<Node_Id> parent;
+    std::unordered_set<Node_Id> children;
+};
+
 class TreeDecomposition {
-    std::vector<Node_Id> nodes;
-    std::unordered_set<TD_Edge> edges;
-    TreeDecompositionAdjacencies adjacencies;
-
-    std::vector<std::string> node_id_to_name;
-    std::vector<Bag> node_id_to_bag_contents;
-    std::unordered_map<std::string, Node_Id> node_name_to_id;
-
-    const UndirectedGraph* graph_ptr;
-
-    size_t next_free_id = 0;
-    size_t treewidth = 0;
-
-    // To root tree:
-    std::optional<Node_Id> root={};
-    std::vector<std::optional<Node_Id>> parents;
-    std::vector<std::unordered_set<Node_Id>> children;
-
-    // To make it a nice tree decomposition:
-    size_t new_nodes_counter=0;
-
+    
 public:
 
     static TreeDecomposition parseUnsafe(const std::string& input_path, const UndirectedGraph& graph);
@@ -52,21 +41,17 @@ public:
     // Returns true if it is a valid tree decomposition
     bool isValid() const;
 
-    const std::vector<Node_Id>& getNodes() const;
-
     const std::unordered_set<TD_Edge>& getEdges() const;
 
     bool areNeighbours(Node_Id n_id1, Node_Id n_id2) const;
 
-    const std::unordered_set<Node_Id>& getNeighbours(Node_Id n_id) const;
+    // const std::unordered_set<Node_Id>& getNeighbours(Node_Id n_id) const;
 
     std::string idToName(Node_Id n_id) const;
 
     Node_Id nameToId(const std::string& name) const;
 
-    const Bag& getBag(Node_Id n_id) const;
-
-    const std::vector<Bag>& getBags() const;
+    // const Bag& getBag(Node_Id n_id) const;
 
     size_t getTreewidth() const;
 
@@ -82,11 +67,11 @@ public:
     // Returns the children and parents of each node in the tree decomposition if the root were `designated_root`.
     void rootTree(Node_Id designated_root);
 
-    const std::vector<std::optional<Node_Id>>& getParents() const;
+    // const std::vector<std::optional<Node_Id>>& getParents() const;
 
-    const std::vector<std::unordered_set<Node_Id>>& getChildren() const;
+    // const std::unordered_set<Node_Id>& getChildren(Node_Id n_id) const;
 
-    const std::unordered_set<Node_Id>& getChildrenOf(Node_Id n_id) const;
+    const Node_Attributes& getNode(Node_Id n_id) const;
 
     //// To make it a nice tree decomposition ////
 
@@ -95,11 +80,19 @@ public:
     // Turns this tree decomposition into a nice tree decomposition.
     void turnIntoNiceTreeDecomposition();
 
+    void turnIntoNiceTreeDecomposition(Node_Id n_id);
+
+    void makeNodeNice(Node_Id n_id);
+
+    // void removeDuplicateBag(Node_Id n_id, Node_Id child_id);
+
     // Given the id of a node with exactly one child, fills the space between it and its child such that every node in between is either an introduce node or a forget node.
     void bridgeDifference(Node_Id parent_id);
 
     // Given the id of a node with more than one child, fills the space between it and its children such that every node in between is either a join node or an introduce node or a forget node.
     void makeNJoinNodeNice(Node_Id parent_id);
+
+    std::string printNodes(const std::vector<Node_Id> &n_ids) const;
 
     std::string printBag(const Bag& bag) const;
 
@@ -117,17 +110,42 @@ public:
     std::ostream& operator<<(std::ostream& stream, const TreeDecomposition& td);
 
 private:
+    std::unordered_map<Node_Id, Node_Attributes> nodes;
+    std::unordered_map<std::string, Node_Id> node_name_to_id;
+    std::unordered_set<TD_Edge> edges;
+
+    // std::unordered_set<Node_Id> nodes;
+    // TreeDecompositionAdjacencies adjacencies;
+
+    // std::unordered_map<Node_Id, std::string> node_id_to_name;
+    // std::unordered_map<Node_Id, Bag> node_id_to_bag_contents;
+
+    const UndirectedGraph* graph_ptr;
+
+    size_t next_free_id = 0;
+    size_t treewidth = 0;
+
+    // To root tree:
+    std::optional<Node_Id> root={};
+    // std::unordered_map<Node_Id, std::optional<Node_Id>> parents;
+    // std::unordered_map<Node_Id, std::unordered_set<Node_Id>> children;
+
+    // To make it a nice tree decomposition:
+    size_t new_nodes_counter=0;
+
     TreeDecomposition(const UndirectedGraph& graph) : graph_ptr(&graph) {}
 
     Node_Id addNode();
 
     Node_Id addNode(const std::string& n_name);
+
+    Node_Id removeNode(Node_Id n_id);
     
     void addEdge(Node_Id n1_id, Node_Id n2_id);
 
     void removeEdge(Node_Id n1_id, Node_Id n2_id);
 
-    void setBag(Node_Id n_id, const Bag& bag_content); // copy bag
+    // void setBag(Node_Id n_id, const Bag& bag_content); // copy bag
 
-    void setBag(Node_Id n_id, Bag&& bag_content); // move existing bag
+    // void setBag(Node_Id n_id, Bag&& bag_content); // move existing bag
 };

@@ -9,37 +9,35 @@ using std::endl;
 bool test_bridge_difference_order(std::string root, const std::vector<std::string>& names) {
     UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/cycle.gr.csv");
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/cycle.td.csv", graph);
-    bool success = true;
 
-    success &= returnAndOutputOnFailure(false, td.getNodes().empty());
-    success &= returnAndOutputOnFailure(true, td.isValid());
-    success &= returnAndOutputOnFailure(false, td.isRooted());
-    success &= returnAndOutputOnFailure(false, td.isNiceTreeDecomposition());
+    assert(td.isValid());
+    assert(!td.isRooted());
     
     td.rootTree(td.nameToId(root));
-    success &= returnAndOutputOnFailure(true, td.isValid());
-    success &= returnAndOutputOnFailure(true, td.isRooted());
-    success &= returnAndOutputOnFailure(false, td.isNiceTreeDecomposition());
+
+    assert(td.isValid());
+    assert(td.isRooted());
+    assert(!td.isNiceTreeDecomposition());
 
     for (size_t name_pos = 0; name_pos < names.size() - 1; name_pos++) {
         td.bridgeDifference(td.nameToId(names[name_pos]));
-        success &= returnAndOutputOnFailure(false, td.isNiceTreeDecomposition());
+        assert(!td.isNiceTreeDecomposition());
     }
     
     td.bridgeDifference(td.nameToId(names[names.size() - 1]));
-    success &= returnAndOutputOnFailure(true, td.isNiceTreeDecomposition());
+    assert(td.isNiceTreeDecomposition());
 
-    return success;
+    return true;
 }
 
 bool test_bridge_difference_2() {
     UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/sigma_graph.gr.csv");
     TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/sigma_graph.td.csv", graph);
 
+    bool success = true;
     td.rootTree(td.nameToId("N1"));
     td.bridgeDifference(td.nameToId("N1"));
-
-    bool success = true;
+    assert(td.isRooted());
     
     success &= returnAndOutputOnFailure(true, td.isValid());
     success &= returnAndOutputOnFailure(true, td.isNiceTreeDecomposition());

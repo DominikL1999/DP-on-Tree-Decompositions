@@ -5,7 +5,8 @@ set (TEST_FILES
     test_is_valid.cpp;
     test_make_n_join_node_nice.cpp;
     test_parse_unsafe.cpp;
-    test_root_tree.cpp)
+    test_root_tree.cpp;
+    test_turn_into_nice_tree_decomposition.cpp)
 
 string(REPLACE "${CMAKE_SOURCE_DIR}/" "" TestSuiteName "${CMAKE_CURRENT_SOURCE_DIR}")
 string(REPLACE "/" "_" TestSuiteName ${TestSuiteName})
