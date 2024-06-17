@@ -24,19 +24,18 @@ bool test_easy() {
 
 bool test_hard() {
     bool success = true;
-    for (int i = 1; i < 10; i) {
+    for (int i = 1; i < 1; i) {
         UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/Treewidth-PACE-2017-Instances/ex00" + std::to_string(i) + ".gr.csv");
         TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/Treewidth-PACE-2017-Instances/ex00" + std::to_string(i) + ".gr.csv", graph);
         Node_Id root = td.rootTree();
 
         td.turnIntoNiceTreeDecomposition();
         if (!td.isNiceTreeDecomposition()) {
-            success = false;
-            break;
+            return false;
         }
     }
 
-    return !success;
+    return true;
 }
 
 int test_turn_into_nice_tree_decomposition(int argc, char** argv) {

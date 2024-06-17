@@ -5,6 +5,7 @@ set (TEST_FILES
     test_is_valid.cpp;
     test_make_n_join_node_nice.cpp;
     test_parse_unsafe.cpp;
+    test_remove_duplicate_bags.cpp;
     test_root_tree.cpp;
     test_turn_into_nice_tree_decomposition.cpp)
 
