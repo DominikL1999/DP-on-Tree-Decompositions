@@ -33,3 +33,11 @@ build/
 *.exe
 *.out
 *.app
+
+# Latex output
+solution_description.aux
+solution_description.fdb_latexmk
+solution_description.fls
+solution_description.log
+solution_description.synctex.gz
+solution_description.aux

@@ -1,0 +1,58 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath, amssymb}
+
+\title{MINIMUM WEIGHTED VERTEX COVER by Dynamic Programming on Tree Decompositions}
+\author{Dominik Leko}
+\date{February 2024}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\begin{document}
+
+\maketitle
+
+\section{Problem description}
+
+Given a graph $G = (V, E)$, a tree decomposition $\mathcal{T} = (T, \chi)$ of $G$ of width $k$ and a function $w : V \rightarrow \mathbb{R}$, find $X \subseteq V$ such that $X$ is a vertex cover of $G$ and $\sum_{x \in X} w(x)$ is minimal.
+
+\section{Dynamic Programming description}
+
+The problem is solved via a dynamic programming approach on $T$. The algorithm has 3 steps:
+
+\begin{enumerate}
+    \item For each $t \in T$ and each $U \subseteq \chi(t)$, initialize $M_t(U)$. $M_t(U)$ is the best (i.e. minimum weight) vertex cover $VC$ found for subtree $T_t$ where $\chi(t) \cap VC = U$.
+    \item Update $M_t(U)$ with dynamic programming.
+    \item Output $max \{n_r(U) | U \subseteq \chi(r)\}$.
+\end{enumerate}
+
+\section{Update nodes of nice Tree Decomposition via Dynamic Programming}
+
+Let $t$ be the current node for which to update each $M_t(U)$ and $t'$ and $t''$ its potential children.
+
+\begin{enumerate}
+    \item Leaf Nodes. Let $v$ be the single vertex in $\chi(t)$:
+    \begin{gather*}
+        M_t(\{\}) = 0 \\
+        M_t(\{v\}) = w(v)
+    \end{gather*}
+    \item Introduce Nodes. Let $v$ be the newly introduced vertex, i.e. $\chi(t') \setminus \chi(t) = \{v\}$.
+    \begin{gather*}
+        M_t(U) =
+        \begin{cases}
+            M_{t'}(U) ,& \text{if } v \notin U\\
+            M_{t'}(U) + w(v) ,& \text{if } v \in U
+        \end{cases}
+    \end{gather*}
+    \item Forget Nodes. Let $v$ be the newly forgotten vertex, i.e. $\chi(t) \setminus \chi(t) = \{v\}$.
+    \begin{gather*}
+        M_t(U) = min(M_{t'}(U), M_{t'}(U \cup \{v\}))
+    \end{gather*}
+    \item Join Nodes.
+    \begin{gather*}
+        M_t(U) = M_{t'} + M_{t''} - \sum_{v \in U} w(v)
+    \end{gather*}
+\end{enumerate}
+
+\end{document}
