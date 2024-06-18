@@ -161,3 +161,29 @@ std::ostream& operator<<(std::ostream& stream, const std::unordered_map<T1,T2>& 
     }
     return stream;
 }
+
+//// For hashing ////
+
+template<typename T>
+struct std::hash<std::unordered_set<T>>
+{
+    size_t operator()(const std::unordered_set<T>& set) const {
+        size_t seed = 0;
+        for (const T& elem : set) {
+            seed ^= std::hash<T>{}(elem) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        }
+        return seed;
+    }
+};
+
+// template<typename T1, typename T2>
+// struct std::hash<std::unordered_map<T1,T2>>
+// {
+//     size_t operator()(const std::unordered_map<T1,T2>& map) const {
+//         size_t seed = 0;
+//         for (const auto& elem : map) {
+//             seed ^= std::hash<T1>{}(elem.first) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+//         }
+//         return seed;
+//     }
+// };

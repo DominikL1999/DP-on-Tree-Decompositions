@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 using Vertex_Id = std::size_t;
-using Vertex_Label = double;
+using Vertex_Weight = double;
 using UndirectedGraphAdjacencies = std::vector<std::vector<Vertex_Id>>;
 using Edge = std::pair<Vertex_Id, Vertex_Id>;
 
@@ -20,7 +20,7 @@ class UndirectedGraph {
 
     // The names of the vertices (usually just numbers). This is *not* the label of the vertex, because the labels represent a vertices' weight.
     std::vector<std::string> vertex_id_to_name;
-    std::vector<Vertex_Label> vertex_id_to_label;
+    std::vector<Vertex_Weight> vertex_id_to_weight;
     std::unordered_map<std::string, Vertex_Id> vertex_name_to_id;
 
     size_t next_free_id = 0;
@@ -40,6 +40,8 @@ public:
 
     const std::vector<Edge>& getEdges() const;
 
+    const Vertex_Weight getWeight(Vertex_Id v_id) const;
+
     const std::vector<Vertex_Id>& getNeighbours(Vertex_Id v_id) const;
 
     bool areNeighbours(Vertex_Id v_id1, Vertex_Id v_id2) const;
@@ -52,7 +54,7 @@ private:
     // adds new vertex with given name if this vertex has not been added before
     Vertex_Id addVertex(const std::string& name);
 
-    void labelVertex(Vertex_Id v_id, Vertex_Label label);
+    void setWeight(Vertex_Id v_id, Vertex_Weight label);
 
     // adds new edge. If the edge_type is different than what was previously seen, instead returns false
     void addEdge(Vertex_Id v_id1, Vertex_Id v_id2);

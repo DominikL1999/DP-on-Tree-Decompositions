@@ -23,7 +23,7 @@ struct std::hash<TD_Edge>
     }
 };
 
-class Node_Attributes {
+class Node {
 public:
     std::unordered_set<Node_Id> neighbours;
     std::string name;
@@ -33,7 +33,7 @@ public:
 };
 
 class TreeDecomposition {
-    std::unordered_map<Node_Id, Node_Attributes> nodes;
+    std::unordered_map<Node_Id, Node> nodes;
     std::unordered_map<std::string, Node_Id> node_name_to_id;
     std::unordered_set<TD_Edge> edges;
 
@@ -77,7 +77,7 @@ public:
     // Removes nodes whose parents' bag is identical to its own and instead connects the parent to all its children.
     void removeDuplicateNeighbours();
 
-    const Node_Attributes& getNode(Node_Id n_id) const;
+    const Node& getNode(Node_Id n_id) const;
 
     //// To make it a nice tree decomposition ////
 
@@ -87,8 +87,6 @@ public:
     void turnIntoNiceTreeDecomposition();
 
     void turnIntoNiceTreeDecomposition(Node_Id n_id);
-
-    void makeNodeNice(Node_Id n_id);
 
     // Given the id of a node with exactly one child, fills the space between it and its child such that every node in between is either an introduce node or a forget node.
     void bridgeDifference(Node_Id parent_id);

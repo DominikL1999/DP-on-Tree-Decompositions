@@ -36,7 +36,7 @@ UndirectedGraph UndirectedGraph::parseUnsafe(const string& input_path) {
         else if (comma_parts.size() == 3) { // Case II
             const std::string& label = comma_parts[2];
             Vertex_Id v_id = graph.addVertex(v1_name);
-            graph.labelVertex(v_id, std::stod(label)); // immediately parse as number (double)
+            graph.setWeight(v_id, std::stod(label)); // immediately parse as number (double)
         }
         else {
             throw std::invalid_argument::exception();
@@ -74,6 +74,10 @@ const std::vector<Edge>& UndirectedGraph::getEdges() const {
     return edges;
 }
 
+const Vertex_Weight UndirectedGraph::getWeight(Vertex_Id v_id) const {
+    return vertex_id_to_weight[v_id];
+}
+
 const std::vector<Vertex_Id>& UndirectedGraph::getNeighbours(Vertex_Id v_id) const {
     return adjacencies.at(v_id);
 }
@@ -91,7 +95,7 @@ Vertex_Id UndirectedGraph::addVertex(const string &v_name) {
         adjacencies.push_back({});
 
         vertex_id_to_name.push_back(v_name);
-        vertex_id_to_label.push_back({});
+        vertex_id_to_weight.push_back({});
         vertex_name_to_id.insert({v_name, new_id});
     }
     else {
@@ -101,8 +105,8 @@ Vertex_Id UndirectedGraph::addVertex(const string &v_name) {
     return new_id;
 }
 
-void UndirectedGraph::labelVertex(Vertex_Id v_id, Vertex_Label label) {
-    vertex_id_to_label[v_id] = label;
+void UndirectedGraph::setWeight(Vertex_Id v_id, Vertex_Weight label) {
+    vertex_id_to_weight[v_id] = label;
 }
 
 void UndirectedGraph::addEdge(Vertex_Id v1_id, Vertex_Id v2_id) {
@@ -115,7 +119,7 @@ std::ostream& operator<<(std::ostream& stream, const UndirectedGraph& graph) {
     stream << graph.numberOfNodes() << " vertices, " << graph.numberOfEdges() << " edges." << std::endl;
     stream << "vertex labels:" << std::endl;
     for (Vertex_Id v_id = 0; v_id < graph.numberOfNodes(); v_id++) {
-        stream << "    " << graph.vertex_id_to_name.at(v_id) << ": " << graph.vertex_id_to_label.at(v_id);
+        stream << "    " << graph.vertex_id_to_name.at(v_id) << ": " << graph.vertex_id_to_weight.at(v_id);
     }
 
     stream << std::endl << "edges:" << std::endl;

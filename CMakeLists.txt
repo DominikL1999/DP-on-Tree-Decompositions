@@ -10,16 +10,16 @@ set(BODY_DIR ${SRC_DIR}/body)
 set(TEST_DIR test)
 
 set(HEADER_FILES
-    ${HEADER_DIR}/undirected_graph.h;
-    ${HEADER_DIR}/min-vertex-cover.h;
+    ${HEADER_DIR}/min_weighted_vertex_cover.h;
     ${HEADER_DIR}/tree_decomposition.h;
+    ${HEADER_DIR}/undirected_graph.h;
     ${HEADER_DIR}/util.h
 )
 
 set(BODY_FILES
-    ${BODY_DIR}/undirected_graph.cpp;
-    ${BODY_DIR}/min-vertex-cover.cpp;
+    ${BODY_DIR}/min_weighted_vertex_cover.cpp;
     ${BODY_DIR}/tree_decomposition.cpp;
+    ${BODY_DIR}/undirected_graph.cpp;
     ${BODY_DIR}/util.cpp
 )
 
