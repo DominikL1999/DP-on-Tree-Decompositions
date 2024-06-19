@@ -1,5 +1,6 @@
 #include "undirected_graph.h"
 #include "tree_decomposition.h"
+#include "min_weighted_vertex_cover.h"
 #include "util.h"
 
 #include <iostream>
@@ -42,6 +43,14 @@ int main(int argc, char* argv[]) {
 
     td.rootTree();
     td.turnIntoNiceTreeDecomposition();
-    cout << "Is the result tree decomposition valid? - " << td.isValid() << endl;
-    cout << "Is the resulting tree decomposition nice? - " << td.isNiceTreeDecomposition() << endl;
+    assert(td.isValid());
+    assert(td.isNiceTreeDecomposition());
+    cout << "td: " << td << endl;
+
+    MinWeightedVertexCover solver{graph, td};
+    auto solution = solver.solve();
+    solver.printM();
+    // cout << "solution: " << solution << endl;
+
+    // cout << "graph: " << graph << endl;
 }

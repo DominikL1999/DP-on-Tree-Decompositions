@@ -37,15 +37,16 @@ Let $t$ be the current node for which to update each $M_t(U)$ and $t'$ and $t''$
         M_t(\{\}) = 0 \\
         M_t(\{v\}) = w(v)
     \end{gather*}
-    \item Introduce Nodes. Let $v$ be the newly introduced vertex, i.e. $\chi(t') \setminus \chi(t) = \{v\}$.
+    \item Introduce Nodes. Let $v$ be the newly introduced vertex, i.e. $\chi(t) \setminus \chi(t') = \{v\}$.
     \begin{gather*}
-        M_t(U) =
+        \text{if $v \in U$: } M_t(U) = M_{t'}(U) + w(v)\\
+        \text{if $v \notin U$: } M_t(U) =
         \begin{cases}
-            M_{t'}(U) ,& \text{if } v \notin U\\
-            M_{t'}(U) + w(v) ,& \text{if } v \in U
+            M_t'(U) & \text{, if U is a vertex cover of $G_t$} \\
+            \infty & \text{, otherwise}
         \end{cases}
     \end{gather*}
-    \item Forget Nodes. Let $v$ be the newly forgotten vertex, i.e. $\chi(t) \setminus \chi(t) = \{v\}$.
+    \item Forget Nodes. Let $v$ be the newly forgotten vertex, i.e. $\chi(t') \setminus \chi(t) = \{v\}$.
     \begin{gather*}
         M_t(U) = min(M_{t'}(U), M_{t'}(U \cup \{v\}))
     \end{gather*}
