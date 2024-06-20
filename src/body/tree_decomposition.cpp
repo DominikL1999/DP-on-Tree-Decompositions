@@ -585,7 +585,7 @@ std::ostream &operator<<(std::ostream &stream, const TreeDecomposition &td)
             std::vector<std::string> bag_names;
             for (const Vertex_Id v_id : node.bag)
                 bag_names.push_back(td.graph_ptr->idToName(v_id));
-            stream << td.idToName(n_id) << ": " << bag_names << ". Children: " << children_names << std::endl;
+            stream << td.idToName(n_id) << "(" << n_id << ")" << ": " << bag_names << ". Children: " << children_names << std::endl;
         });
     }
     else {

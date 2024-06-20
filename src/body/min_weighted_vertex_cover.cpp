@@ -11,11 +11,7 @@ Solution MinWeightedVertexCover::solve()
     assert(td.isRooted());
     assert(td.isNiceTreeDecomposition());
 
-    bool root_happened = false;
-
-    td.doSomethingPostOrder([this, &root_happened](const Node_Id t_id) {
-
-        assert((td.getRoot() == t_id) || (!root_happened));
+    td.doSomethingPostOrder([this](const Node_Id t_id) {
 
         // update M here
         const auto t = td.getNode(t_id);
@@ -23,8 +19,12 @@ Solution MinWeightedVertexCover::solve()
         if (t.children.empty()) { // is a leaf node
             assert(t.bag.size() == 1);
             Vertex_Id v = *t.bag.begin();
-            M[t_id][{}] = {{}, 0};
-            M[t_id][{v}] = {{v}, graph.getWeight(v)};
+            M.insert({t_id, {}});
+            M[t_id].insert({{}, {{}, 0}});
+            M[t_id].insert({{v}, {{v}, graph.getWeight(v)}});
+
+            // M[t_id][{}] = {{}, 0};
+            // M[t_id][{v}] = {{v}, graph.getWeight(v)};
         }
         else if (t.children.size() == 1) {
             Node_Id t_prime_id = *t.children.begin();
@@ -55,9 +55,6 @@ Solution MinWeightedVertexCover::solve()
                 }
                 assert(prime_table.size() == first_prime_table_size); // If this goes off, then the local prime_table was changed somehow
                 assert(prime_table.size() == M.at(t_prime_id).size());
-
-                // remove all entries for the child to reclaim memory space.
-                // M.erase(t_prime_id);
             }
             else { // node is a forget node
                 assert(t_prime.bag.size() - t.bag.size() == 1);
@@ -80,17 +77,14 @@ Solution MinWeightedVertexCover::solve()
                 }
                 assert(prime_table.size() == first_prime_table_size); // If this goes off, then the local prime_table was changed somehow
                 assert(prime_table.size() == M.at(t_prime_id).size());
-
-                // remove all entries for the child to reclaim memory space.
-                // M.erase(t_prime_id);
             }
 
             assert(prime_table.size() == M.at(t_prime_id).size());
+
+            // remove all entries for the child to reclaim memory space.
+            M.erase(t_prime_id);
         }
         else { // is a join node
-            if (td.getRoot() == t_id) {
-                root_happened = true;
-            }
             assert(t.children.size() == 2);
             auto it = t.children.begin();
             Node_Id t1_id = *it;
@@ -111,12 +105,10 @@ Solution MinWeightedVertexCover::solve()
                 M[t_id][U_prime] = {U_prime, weight1 + weight2 - extra_weight};
             }
             // remove all entries for both children to reclaim memory space.
-            // M.erase(t1_id);
-            // M.erase(t2_id);
+            M.erase(t1_id);
+            M.erase(t2_id);
         }
     });
-
-    assert(root_happened);
 
     Node_Id root_id = td.getRoot();
     auto bla = *std::min_element(M[root_id].begin(), M[root_id].end(), [](const std::pair<Vertex_Cover, Solution>& pair1, const std::pair<Vertex_Cover, Solution>& pair2){
