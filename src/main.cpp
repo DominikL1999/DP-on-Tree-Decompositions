@@ -50,9 +50,5 @@ int main(int argc, char* argv[]) {
     MinWeightedVertexCover solver{graph, td};
     auto solution = solver.solve();
     cout << "solution: " << solution << endl;
-    cout << "root: " << td.idToName(td.getRoot()) << endl;
     solver.printM();
-    // cout << "solution: " << solution << endl;
-
-    // cout << "graph: " << graph << endl;
 }

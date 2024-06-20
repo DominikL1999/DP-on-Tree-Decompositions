@@ -8,8 +8,8 @@ using Vertex_Cover = std::unordered_set<Vertex_Id>;
 using Vertex_Cover_Weight = Vertex_Weight;
 
 struct Solution {
-    Vertex_Cover vertex_cover;
-    Vertex_Cover_Weight vertex_cover_weight;
+    Vertex_Cover past_vertex_cover;
+    Vertex_Cover_Weight past_vertex_cover_weight;
 };
 
 std::ostream& operator<<(std::ostream& os, const Solution& sol);
@@ -28,14 +28,11 @@ public:
 
     void printM() const;
 
+    std::unordered_map<Node_Id, Table>M;
+
 private:
     const UndirectedGraph& graph;
     const TreeDecomposition& td;
-
-    std::unordered_map<Node_Id, Table>M;
-
-    // Returns thue, if the partial solution is a vertex cover *without* vertex with id `v_id`.
-    bool isVertexCoverWithout(const Solution& sol, Vertex_Id v_id) const;
 
     std::unordered_set<Vertex_Cover> intersect(Node_Id n1_id, Node_Id n2_id) const;
 

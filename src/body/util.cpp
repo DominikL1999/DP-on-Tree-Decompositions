@@ -4,6 +4,13 @@
 #include <iostream>
 
 using namespace std;
+
+double EPSILON = 1e-6;
+
+bool doubleEqual(const double& d1, const double& d2) {
+    return std::abs(d1 - d2) < EPSILON;
+}
+
 std::vector<std::string> stringSplit(const std::string &str, char delim)
 {
     std::vector<std::string> parts;

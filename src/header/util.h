@@ -13,6 +13,8 @@ bool endsWith(const std::string& str, const std::string& end);
 
 std::string stripToFilename(const std::string& path);
 
+bool doubleEqual(const double& d1, const double& d2);
+
 template<typename T>
 bool contains(const std::vector<T>& vec, const T& elem) {
     return std::find(vec.begin(), vec.end(), elem) != vec.end();
@@ -142,8 +144,10 @@ std::ostream& operator<<(std::ostream& stream, const std::vector<T>& vec) {
 // `std::cout << v << << std::endl;`
 template<typename T>
 std::ostream& operator<<(std::ostream& stream, const std::unordered_set<T>& set) {
+    stream << "{";
     for (const T& elem : set)
         stream << elem << " ";
+    stream << "}";
     return stream;
 }
 
@@ -168,22 +172,12 @@ template<typename T>
 struct std::hash<std::unordered_set<T>>
 {
     size_t operator()(const std::unordered_set<T>& set) const {
+        std::vector<T>vec{set.begin(), set.end()};
+        std::sort(vec.begin(), vec.end());
         size_t seed = 0;
-        for (const T& elem : set) {
+        for (const T& elem : vec) {
             seed ^= std::hash<T>{}(elem) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
         }
         return seed;
     }
 };
-
-// template<typename T1, typename T2>
-// struct std::hash<std::unordered_map<T1,T2>>
-// {
-//     size_t operator()(const std::unordered_map<T1,T2>& map) const {
-//         size_t seed = 0;
-//         for (const auto& elem : map) {
-//             seed ^= std::hash<T1>{}(elem.first) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-//         }
-//         return seed;
-//     }
-// };
