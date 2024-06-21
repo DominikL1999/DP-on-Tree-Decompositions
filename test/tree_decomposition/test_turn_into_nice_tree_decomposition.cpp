@@ -23,6 +23,15 @@ bool test_easy() {
     return true;
 }
 
+bool test_medium() {
+    UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/house.gr.csv");
+    TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/house_with_unneccesary_join.td.csv", graph);
+    
+    Node_Id root = td.rootTree();
+    td.turnIntoNiceTreeDecomposition();
+    return td.isNiceTreeDecomposition();
+}
+
 bool test_hard() {
     bool success = true;
     for (int i = 1; i < 1; i) {
@@ -43,6 +52,7 @@ int test_turn_into_nice_tree_decomposition(int argc, char** argv) {
     bool success = true;
 
     success &= test_hard();
+    success &= test_medium();
     success &= test_easy();
 
     return !success;

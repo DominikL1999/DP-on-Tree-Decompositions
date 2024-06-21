@@ -19,12 +19,9 @@ Solution MinWeightedVertexCover::solve()
         if (t.children.empty()) { // is a leaf node
             assert(t.bag.size() == 1);
             Vertex_Id v = *t.bag.begin();
-            M.insert({t_id, {}});
-            M[t_id].insert({{}, {{}, 0}});
-            M[t_id].insert({{v}, {{v}, graph.getWeight(v)}});
 
-            // M[t_id][{}] = {{}, 0};
-            // M[t_id][{v}] = {{v}, graph.getWeight(v)};
+            M[t_id][{}] = {{}, 0};
+            M[t_id][{v}] = {{v}, graph.getWeight(v)};
         }
         else if (t.children.size() == 1) {
             Node_Id t_prime_id = *t.children.begin();
@@ -95,7 +92,6 @@ Solution MinWeightedVertexCover::solve()
 
             // 1. Intersect the U_prime for the left and the right subtree.
             auto intersected_U_prime = intersect(t1_id, t2_id);
-            // std::unordered_set<Vertex_Cover> intersected_U_prime = intersect(t1_id, t2_id);
 
             // 2. Go over the intersection and update M[t_id]
             for (const Vertex_Cover U_prime : intersected_U_prime) {
