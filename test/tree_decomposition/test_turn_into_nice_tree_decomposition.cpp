@@ -7,7 +7,6 @@ using std::endl;
 bool test_easy() {
     std::vector<std::string>test_names{"cycle", "house", "k4_plus_2_appendages", "k4_plus_3_appendages", "k4_plus_4_appendages", "sigma_graph"};
     for (const std::string& test_name : test_names) {
-        cout << "TEST_NAME: " << test_name << endl;
         UndirectedGraph graph = UndirectedGraph::parseUnsafe("test-instances/unit-test-instances/" + test_name + ".gr.csv");
         TreeDecomposition td = TreeDecomposition::parseUnsafe("test-instances/unit-test-instances/" + test_name + ".td.csv", graph);
         Node_Id root = td.rootTree();

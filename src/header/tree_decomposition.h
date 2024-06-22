@@ -28,7 +28,7 @@ public:
     std::unordered_set<Node_Id> neighbours;
     std::string name;
     Bag bag;
-    std::optional<Node_Id> parent;
+    std::optional<Node_Id> parent={};
     std::unordered_set<Node_Id> children;
 };
 
@@ -74,7 +74,7 @@ public:
     // Returns the children and parents of each node in the tree decomposition if the root were `designated_root`.
     void rootTree(Node_Id designated_root);
 
-    // Removes nodes whose parents' bag is identical to its own and instead connects the parent to all its children.
+    // Removes the single child of nodes whose bag is identical to its childs' and instead connects the parent to all its child's children.
     void removeDuplicateNeighbours();
 
     const Node& getNode(Node_Id n_id) const;
@@ -86,13 +86,17 @@ public:
     // Turns this tree decomposition into a nice tree decomposition.
     void turnIntoNiceTreeDecomposition();
 
-    void turnIntoNiceTreeDecomposition(Node_Id n_id);
+    // todo: remove
+    void assertAllHaveParents() const;
 
     // Given the id of a node with exactly one child, fills the space between it and its child such that every node in between is either an introduce node or a forget node.
     void bridgeDifference(Node_Id parent_id);
 
     // Given the id of a node with more than one child, fills the space between it and its children such that every node in between is either a join node or an introduce node or a forget node.
     void makeNJoinNodeNice(Node_Id parent_id);
+
+    // todo: remove
+    void assertAfterBridgeDifference(Node_Id ancestor, Node_Id descendant) const;
 
     std::vector<Node_Id> getAllNodeIds() const;
 
@@ -123,11 +127,11 @@ private:
 
     TreeDecomposition(const UndirectedGraph& graph) : graph_ptr(&graph) {}
 
-    void turnIntoNiceTreeDecomposition_Rec(Node_Id n_id);
+    // void turnIntoNiceTreeDecomposition_Rec(Node_Id n_id);
 
     Node_Id addNode();
 
-    Node_Id addNode(const std::string& n_name);
+    Node_Id addNode(std::string n_name);
 
     void removeNode(Node_Id n_id);
     

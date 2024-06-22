@@ -42,10 +42,12 @@ int main(int argc, char* argv[]) {
     TreeDecomposition td = TreeDecomposition::parseUnsafe(td_input_path, graph);
 
     td.rootTree();
-    td.turnIntoNiceTreeDecomposition();
-    assert(td.isValid());
-    assert(td.isNiceTreeDecomposition());
     cout << "td: " << td << endl;
+    td.turnIntoNiceTreeDecomposition();
+    cout << "Nice td: " << td << endl;
+    assert(td.isValid());
+    bool isNiceTD = td.isNiceTreeDecomposition();
+    assert(isNiceTD);
 
     MinWeightedVertexCover solver{graph, td};
     auto solution = solver.solve();

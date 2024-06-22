@@ -14,7 +14,7 @@ void solve_unit_test_instance(const std::string& graph_file, const std::string& 
 
     cout << "graph_file: " << graph_file << endl;
     Node_Id root_id = td.rootTree();
-    td.turnIntoNiceTreeDecomposition(root_id);
+    td.turnIntoNiceTreeDecomposition();
     MinWeightedVertexCover solver{graph, td};
     cout << "td: " << td << endl;
 
