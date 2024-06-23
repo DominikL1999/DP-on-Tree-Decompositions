@@ -2,6 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 set (TEST_FILES
     test_bridge_difference.cpp;
+    test_get_treewidth.cpp;
     test_is_valid.cpp;
     test_make_n_join_node_nice.cpp;
     test_parse_unsafe.cpp;

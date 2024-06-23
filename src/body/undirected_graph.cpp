@@ -36,7 +36,7 @@ UndirectedGraph UndirectedGraph::parseUnsafe(const string& input_path) {
         else if (comma_parts.size() == 3) { // Case II
             const std::string& label = comma_parts[2];
             Vertex_Id v_id = graph.addVertex(v1_name);
-            graph.setWeight(v_id, std::stod(label)); // immediately parse as number (double)
+            graph.setWeight(v_id, std::stoi(label)); // immediately parse as number (double)
         }
         else {
             throw std::invalid_argument::exception();

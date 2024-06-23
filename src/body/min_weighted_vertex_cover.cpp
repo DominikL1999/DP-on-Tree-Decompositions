@@ -13,7 +13,10 @@ Solution MinWeightedVertexCover::solve()
 
     int counter = 0;
 
-    td.doSomethingPostOrder([this, &counter](const Node_Id t_id) {
+    std::unordered_set<Node_Id> visited_nodes; // todo: remove
+    td.doSomethingPostOrder([this, &counter, &visited_nodes](const Node_Id t_id) {
+        assert(visited_nodes.find(t_id) == visited_nodes.end());
+        visited_nodes.insert(t_id);
         counter++;
         assert(M.find(t_id) == M.end());
         M.insert({t_id, {}});

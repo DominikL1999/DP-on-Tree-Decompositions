@@ -156,6 +156,13 @@ void TreeDecomposition::turnIntoNiceTreeDecomposition() {
     removeDuplicateNeighbours();
 }
 
+size_t TreeDecomposition::getTreewidth() const {
+    auto& max_elem = *std::max_element(nodes.begin(), nodes.end(), [this](auto n1_pair, auto n2_pair){
+        return n1_pair.second.bag.size() < n2_pair.second.bag.size();
+    });
+    return max_elem.second.bag.size() - 1;
+}
+
 void TreeDecomposition::assertAllHaveParents() const {
     assert(isRooted());
     doSomethingPostOrder([this](Node_Id n_id){

@@ -86,6 +86,8 @@ public:
     // Turns this tree decomposition into a nice tree decomposition.
     void turnIntoNiceTreeDecomposition();
 
+    size_t getTreewidth() const;
+
     // todo: remove
     void assertAllHaveParents() const;
 

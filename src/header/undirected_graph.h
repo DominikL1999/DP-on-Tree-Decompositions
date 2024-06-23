@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 using Vertex_Id = std::size_t;
-using Vertex_Weight = double;
+using Vertex_Weight = int;
 using UndirectedGraphAdjacencies = std::vector<std::vector<Vertex_Id>>;
 using Edge = std::pair<Vertex_Id, Vertex_Id>;
 
