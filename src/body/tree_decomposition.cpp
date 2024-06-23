@@ -216,16 +216,6 @@ void TreeDecomposition::makeNJoinNodeNice(Node_Id cur_n_id) {
     }
 }
 
-std::vector<Node_Id> TreeDecomposition::getAllNodeIds() const {
-    std::vector<Node_Id>node_ids;
-
-    for (const auto& n_pair : nodes) {
-        node_ids.push_back(n_pair.first);
-    }
-
-    return node_ids;
-}
-
 std::vector<string> TreeDecomposition::getAllNodeNames() const {
     std::vector<string>node_names;
 
@@ -234,14 +224,6 @@ std::vector<string> TreeDecomposition::getAllNodeNames() const {
     }
 
     return node_names;
-}
-
-std::string TreeDecomposition::printNodes(const std::vector<Node_Id>& n_ids) const {
-    std::string str = "";
-    for (auto n_id : n_ids) {
-        str += idToName(n_id) + " ";
-    }
-    return str;
 }
 
 bool TreeDecomposition::isValid() const {
@@ -306,12 +288,8 @@ bool TreeDecomposition::isValid() const {
         }
         return visited == compare;
     });
-    
-    if (!success) {
-        return false;
-    }
 
-    return true;
+    return success;
 }
 
 const std::unordered_set<TD_Edge>& TreeDecomposition::getEdges() const {
@@ -486,23 +464,6 @@ void TreeDecomposition::removeEdge(Node_Id n1_id, Node_Id n2_id) {
         nodes[n2_id].parent = {};
         nodes[n1_id].children.erase(n2_id);
     }
-}
-
-string TreeDecomposition::printBag(const Bag& bag) const {
-    string result_str = "";
-    for (const Node_Id& n_id : bag) {
-        result_str += graph_ptr->idToName(n_id) + " ";
-    }
-    return result_str;
-}
-
-string TreeDecomposition::printChildren(Node_Id n_id) const {
-    string result_str = "";
-    const auto& node = nodes.at(n_id);
-    for (const Node_Id& child_id : node.children) {
-        result_str += idToName(child_id) + " ";
-    }
-    return result_str;
 }
 
 void TreeDecomposition::doSomethingPreOrder(std::function<void(Node_Id)>f) const {

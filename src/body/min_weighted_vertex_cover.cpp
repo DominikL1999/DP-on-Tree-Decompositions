@@ -5,8 +5,7 @@
 using std::cout;
 using std::endl;
 
-Solution MinWeightedVertexCover::solve()
-{
+Solution MinWeightedVertexCover::solve() {
     td.doSomethingPostOrder([this](const Node_Id t_id) {
         M.insert({t_id, {}});
 
@@ -63,7 +62,6 @@ Solution MinWeightedVertexCover::solve()
                 }
             }
 
-
             // remove all entries for the child to reclaim memory space.
             M.erase(t_prime_id);
         }
@@ -100,37 +98,19 @@ Solution MinWeightedVertexCover::solve()
     return min_solution.second;
 }
 
-void MinWeightedVertexCover::printM() const {
-    cout << "====== printM 1 ======" << endl;
-    for (const auto& pair : M) {
-        std::string node_name = td.getNode(pair.first).name;
-        cout << node_name << "(" << pair.first << "): ";
-        for (const std::pair<Vertex_Cover, Solution>& inner_pair : pair.second) {
-            cout << "{";
-            for (Vertex_Id v_id : inner_pair.first) {
-                cout << graph.idToName(v_id) << "(" << v_id << ") ";
-            };
-            cout << "} -> " << inner_pair.second.total_weight << " | ";
-        }
-        cout << endl;
-    }
-    cout << "====== printM 2 ======" << endl;
-}
-
 std::unordered_set<Vertex_Cover> MinWeightedVertexCover::intersect(Node_Id n1_id, Node_Id n2_id) const {
     std::unordered_set<Vertex_Cover> covers1;
     std::unordered_set<Vertex_Cover> covers2;
-    for (const std::pair<Vertex_Cover, Solution>& bla : M.at(n1_id)) {
-        covers1.insert(bla.first);
+    for (const std::pair<Vertex_Cover, Solution>& pair : M.at(n1_id)) {
+        covers1.insert(pair.first);
     }
-    for (const std::pair<Vertex_Cover, Solution>& bla : M.at(n2_id)) {
-        covers2.insert(bla.first);
+    for (const std::pair<Vertex_Cover, Solution>& pair : M.at(n2_id)) {
+        covers2.insert(pair.first);
     }
     return setIntersect(covers1, covers2);
 }
 
-Solution MinWeightedVertexCover::addToSolution(const Solution &sol, Vertex_Id v_id) const
-{
+Solution MinWeightedVertexCover::addToSolution(const Solution &sol, Vertex_Id v_id) const {
     return {setUnion(sol.past_vertex_cover, {v_id}), sol.total_weight + graph.getWeight(v_id)};
 }
 
@@ -138,7 +118,6 @@ std::ostream &operator<<(std::ostream &os, const Solution &sol) {
     return os << std::pair<Vertex_Cover, Vertex_Cover_Weight>(sol.past_vertex_cover, sol.total_weight);
 }
 
-bool operator<(const Solution &sol1, const Solution &sol2)
-{
+bool operator<(const Solution &sol1, const Solution &sol2) {
     return sol1.total_weight < sol2.total_weight;
 }

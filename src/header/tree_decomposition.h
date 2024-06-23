@@ -54,11 +54,7 @@ public:
     // Returns true if it is a valid tree decomposition
     bool isValid() const;
 
-    const std::unordered_set<TD_Edge>& getEdges() const;
-
     bool areNeighbours(Node_Id n_id1, Node_Id n_id2) const;
-
-    std::string idToName(Node_Id n_id) const;
 
     Node_Id nameToId(const std::string& name) const;
 
@@ -94,15 +90,7 @@ public:
     // Given the id of a node with more than one child, fills the space between it and its children such that every node in between is either a join node or an introduce node or a forget node.
     void makeNJoinNodeNice(Node_Id parent_id);
 
-    std::vector<Node_Id> getAllNodeIds() const;
-
     std::vector<std::string> getAllNodeNames() const;
-
-    std::string printNodes(const std::vector<Node_Id> &n_ids) const;
-
-    std::string printBag(const Bag& bag) const;
-
-    std::string printChildren(Node_Id n_id) const;
 
     void doSomethingPreOrder(std::function<void(Node_Id)>f) const;
     
@@ -123,7 +111,9 @@ private:
 
     TreeDecomposition(const UndirectedGraph& graph) : graph_ptr(&graph) {}
 
-    // void turnIntoNiceTreeDecomposition_Rec(Node_Id n_id);
+    const std::unordered_set<TD_Edge>& getEdges() const;
+
+    std::string idToName(Node_Id n_id) const;
 
     Node_Id addNode();
 

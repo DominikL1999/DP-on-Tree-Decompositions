@@ -57,13 +57,6 @@ bool test_bridge_difference_3() {
     assert(td.isRooted());
     assert(td.isValid());
     assert(td.isNiceTreeDecomposition());
-    for (Node_Id n_id : td.getAllNodeIds()) {
-        const auto& node = td.getNode(n_id);
-        if (node.children.empty()) {
-            assert(node.bag.size() == 1);
-        }
-    }
-
 
     return true;
 }
@@ -71,18 +64,6 @@ bool test_bridge_difference_3() {
 int test_bridge_difference(int argc, char** argv) {
     assert(test_bridge_difference_2());
     assert(test_bridge_difference_3());
-    // assert(test_bridge_difference_order("N1", {"N1","N2","N3"}));
-    // assert(test_bridge_difference_order("N1", {"N1","N3","N2"}));
-    // assert(test_bridge_difference_order("N1", {"N2","N1","N3"}));
-    // assert(test_bridge_difference_order("N1", {"N2","N3","N1"}));
-    // assert(test_bridge_difference_order("N1", {"N3","N1","N2"}));
-    // assert(test_bridge_difference_order("N1", {"N3","N2","N1"}));
-    // assert(test_bridge_difference_order("N4", {"N4","N2","N3"}));
-    // assert(test_bridge_difference_order("N4", {"N4","N3","N2"}));
-    // assert(test_bridge_difference_order("N4", {"N2","N4","N3"}));
-    // assert(test_bridge_difference_order("N4", {"N2","N3","N4"}));
-    // assert(test_bridge_difference_order("N4", {"N3","N4","N2"}));
-    // assert(test_bridge_difference_order("N4", {"N3","N2","N4"}));
 
     return 0;
 }

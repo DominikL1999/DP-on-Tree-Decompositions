@@ -26,8 +26,6 @@ public:
 
     Solution solve();
 
-    void printM() const;
-
     std::unordered_map<Node_Id, Table>M;
 
 private:
