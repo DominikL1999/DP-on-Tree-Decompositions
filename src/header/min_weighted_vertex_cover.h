@@ -9,7 +9,7 @@ using Vertex_Cover_Weight = Vertex_Weight;
 
 struct Solution {
     Vertex_Cover past_vertex_cover;
-    Vertex_Cover_Weight past_vertex_cover_weight;
+    Vertex_Cover_Weight total_weight;
 };
 
 std::ostream& operator<<(std::ostream& os, const Solution& sol);
@@ -25,6 +25,8 @@ public:
     MinWeightedVertexCover(const UndirectedGraph& graph_, const TreeDecomposition& td_) : graph(graph_), td(td_) {}
 
     Solution solve();
+
+    void assertMContainsTheWholeBag(Node_Id n_id) const;
 
     void printM() const;
 

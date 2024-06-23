@@ -20,7 +20,7 @@ void solve_unit_test_instance(const std::string& graph_file, const std::string& 
 
     Solution solution = solver.solve();
 
-    assert(doubleEqual(solution.past_vertex_cover_weight, expected_min_vertex_cover_weight));
+    assert(doubleEqual(solution.total_weight, expected_min_vertex_cover_weight));
 }
 
 bool solve_unit_test_instances() {

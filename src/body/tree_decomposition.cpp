@@ -291,6 +291,16 @@ void TreeDecomposition::assertAfterBridgeDifference(Node_Id ancestor, Node_Id de
     assert(cur.parent.has_value());
 }
 
+void TreeDecomposition::assertIntroduceNodeHasTwoEqualChildren(Node_Id n_id) const {
+    const auto& node = getNode(n_id);
+    assert(node.children.size() == 2);
+    auto it = node.children.begin();
+    const Node& child1 = getNode(*it);
+    it++;
+    const Node& child2 = getNode(*it);
+    assert(child1.bag == child2.bag);
+}
+
 std::vector<Node_Id> TreeDecomposition::getAllNodeIds() const {
     std::vector<Node_Id>node_ids;
 

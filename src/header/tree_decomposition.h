@@ -98,6 +98,8 @@ public:
     // todo: remove
     void assertAfterBridgeDifference(Node_Id ancestor, Node_Id descendant) const;
 
+    void assertIntroduceNodeHasTwoEqualChildren(Node_Id n_id) const;
+
     std::vector<Node_Id> getAllNodeIds() const;
 
     std::vector<std::string> getAllNodeNames() const;
