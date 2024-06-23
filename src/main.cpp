@@ -30,6 +30,18 @@ bool parseArguments(int argc, char* argv[], std::string& input_path, std::string
     return true;
 }
 
+void outputSolution(const UndirectedGraph& graph, const Solution& solution) {
+    std::vector<Vertex_Id>vertex_cover_vector{solution.past_vertex_cover.begin(), solution.past_vertex_cover.end()};
+
+    cout << "Minimum Vertex Cover: {";
+    for (size_t i = 0; i < vertex_cover_vector.size(); i++) {
+        Vertex_Id v_id = vertex_cover_vector[i];
+        cout << graph.idToName(v_id) << (i == vertex_cover_vector.size() - 1 ? "" : " ");
+    }
+    cout << "}" << endl;
+    cout << "Weight: " << solution.total_weight << endl;
+}
+
 int main(int argc, char* argv[]) {
     std::string input_path;
     std::string td_input_path;
@@ -45,8 +57,8 @@ int main(int argc, char* argv[]) {
     td.turnIntoNiceTreeDecomposition();
 
     MinWeightedVertexCover solver{graph, td};
-    cout << "Tree decomposition has treewidth " << td.getTreewidth() << endl;
+    cout << "Tree decomposition has treewidth " << td.getTreewidth() << "." << endl;
     cout << "Starting to solve..." << endl;
     auto solution = solver.solve();
-    cout << "solution: " << solution << endl;
+    outputSolution(graph, solution);
 }

@@ -17,17 +17,9 @@
 
 Given a graph $G = (V, E)$, a tree decomposition $\mathcal{T} = (T, \chi)$ of $G$ of width $k$ and a function $w : V \rightarrow \mathbb{R}$, find $X \subseteq V$ such that $X$ is a vertex cover of $G$ and $\sum_{x \in X} w(x)$ is minimal.
 
-\section{Dynamic Programming description}
+\section{Dynamic Program description}
 
-The problem is solved via a dynamic programming approach on $T$. The algorithm has 3 steps:
-
-\begin{enumerate}
-    \item For each $t \in T$ and each $U \subseteq \chi(t)$, initialize $M_t(U)$. $M_t(U)$ is the best (i.e. minimum weight) vertex cover $VC$ found for subtree $T_t$ where $\chi(t) \cap VC = U$.
-    \item Update $M_t(U)$ with dynamic programming.
-    \item Output $max \{n_r(U) | U \subseteq \chi(r)\}$.
-\end{enumerate}
-
-\section{Update nodes of nice Tree Decomposition via Dynamic Programming}
+The problem is solved via a dynamic programming approach on $T$. As a preprocessing step, the given tree decomposition is converted into a nice tree decompositino. The dynamic programming algorithm then updates a table at each node from the leaves up by the following rules:
 
 Let $t$ be the current node for which to update each $M_t(U)$ and $t'$ and $t''$ its potential children.
 

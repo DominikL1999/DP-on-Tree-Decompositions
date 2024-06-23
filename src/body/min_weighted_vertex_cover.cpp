@@ -5,6 +5,9 @@
 using std::cout;
 using std::endl;
 
+/*
+In this implementation, when updating the table value at a node n: The author has made the concsious decision to not compute *all* possible 2^bagsize vertex covers, but to derive only the valid vertex covers based on the valid vertex covers of the nodes child(ren) and save the weight of those covers in a map.
+*/
 Solution MinWeightedVertexCover::solve() {
     td.doSomethingPostOrder([this](const Node_Id t_id) {
         M.insert({t_id, {}});
@@ -20,9 +23,7 @@ Solution MinWeightedVertexCover::solve() {
         }
         else if (t.children.size() == 1) {
             Node_Id t_prime_id = *t.children.begin();
-            const auto t_prime = td.getNode(t_prime_id);
-            const auto prime_table = M.at(t_prime_id);
-            size_t first_prime_table_size = M.at(t_prime_id).size();
+            const auto& t_prime = td.getNode(t_prime_id);
 
             if (t.bag.size() > t_prime.bag.size()) { // node is an introduce node
                 // get extra vertex
@@ -31,7 +32,6 @@ Solution MinWeightedVertexCover::solve() {
 
                 for (const auto pair : M.at(t_prime_id)) {
                     const Vertex_Cover& U_prime = pair.first;
-                    Vertex_Cover_Weight weight = pair.second.total_weight;
                     M[t_id][setUnion(U_prime, {v_id})] = addToSolution(M.at(t_prime_id).at(U_prime), v_id);
                     Vertex_Cover forbidden_neighbours = setDifferrence(t_prime.bag, U_prime);
                     bool is_vertex_cover = !std::any_of(forbidden_neighbours.begin(), forbidden_neighbours.end(), [this, v_id](Vertex_Id v2_id) {
@@ -90,6 +90,7 @@ Solution MinWeightedVertexCover::solve() {
         }
     });
 
+    // Return minimum weight solution in root
     Node_Id root_id = td.getRoot();
     auto min_solution = *std::min_element(M.at(root_id).begin(), M.at(root_id).end(), [](const std::pair<Vertex_Cover, Solution>& pair1, const std::pair<Vertex_Cover, Solution>& pair2){
         return pair1.second.total_weight < pair2.second.total_weight;
