@@ -1,5 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
+# List the files containing tests here.
 set (TEST_FILES
     test_ends_with.cpp;
     test_filter.cpp;

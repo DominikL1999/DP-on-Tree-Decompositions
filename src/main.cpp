@@ -44,9 +44,6 @@ int main(int argc, char* argv[]) {
     td.rootTree();
     cout << "Turn into nice tree decomposition..." << endl;
     td.turnIntoNiceTreeDecomposition();
-    // assert(td.isValid());
-    // bool isNiceTD = td.isNiceTreeDecomposition();
-    // assert(isNiceTD);
 
     MinWeightedVertexCover solver{graph, td};
     cout << "Tree decomposition has treewidth " << td.getTreewidth() << endl;

@@ -20,5 +20,4 @@ The file format for the graphs is the CSV file format described in https://githu
 - ✅ Come up with tiny problem instances.
 - ✅ Parse tiny problem instances.
 - ✅ Find/come up with (possibly large) instances with small treewidth to test solver on.
-- Solve MINIMUM WEIGHTED VERTEX COVER on instances with small treewidth.
-- Write unit test to check correctness of solver by brute forcing all possible solutions for the tiny instances.
+- ✅ Solve MINIMUM WEIGHTED VERTEX COVER on instances with small treewidth.

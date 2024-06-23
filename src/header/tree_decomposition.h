@@ -88,17 +88,11 @@ public:
 
     size_t getTreewidth() const;
 
-    // todo: remove
-    void assertAllHaveParents() const;
-
     // Given the id of a node with exactly one child, fills the space between it and its child such that every node in between is either an introduce node or a forget node.
     void bridgeDifference(Node_Id parent_id);
 
     // Given the id of a node with more than one child, fills the space between it and its children such that every node in between is either a join node or an introduce node or a forget node.
     void makeNJoinNodeNice(Node_Id parent_id);
-
-    // todo: remove
-    void assertAfterBridgeDifference(Node_Id ancestor, Node_Id descendant) const;
 
     void assertIntroduceNodeHasTwoEqualChildren(Node_Id n_id) const;
 

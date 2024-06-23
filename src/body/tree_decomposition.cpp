@@ -6,8 +6,6 @@
 #include <cassert>
 #include <stack>
 
-using std::cout; // todo: remove
-using std::endl; // todo: remove
 using std::string;
 
 /*
@@ -123,27 +121,11 @@ void TreeDecomposition::turnIntoNiceTreeDecomposition() {
                 assert(getNode(n_id).children.size() == 1);
                 assert(getNode(new_n_id).parent.has_value());
                 bridgeDifference(n_id);
-                Node_Id cur = n_id; // todo: remove assertion from here
-                while (cur != new_n_id) {
-                    const Node& cur_node = getNode(cur);
-                    assert(cur_node.children.size() == 1);
-                    assert(cur_node.parent.has_value());
-                    cur = *cur_node.children.begin();
-                }
-                assert(getNode(new_n_id).parent.has_value());
             }
         }
         else if (node.children.size() == 1) {
             Node_Id child_id = *node.children.begin();
             bridgeDifference(n_id);
-            Node_Id cur = n_id; // todo: remove assertion from here
-            while (cur != child_id) {
-                const Node& cur_node = getNode(cur);
-                assert(cur_node.children.size() == 1);
-                assert(n_id == getRoot() || cur_node.parent.has_value());
-                cur = *cur_node.children.begin();
-            }
-            assert(getNode(child_id).parent.has_value());
         }
         else if (node.children.size() >= 2) {
             makeNJoinNodeNice(n_id);
@@ -152,7 +134,6 @@ void TreeDecomposition::turnIntoNiceTreeDecomposition() {
             assert(false);
         }
         });
-    assertAllHaveParents();
     removeDuplicateNeighbours();
 }
 
@@ -161,14 +142,6 @@ size_t TreeDecomposition::getTreewidth() const {
         return n1_pair.second.bag.size() < n2_pair.second.bag.size();
     });
     return max_elem.second.bag.size() - 1;
-}
-
-void TreeDecomposition::assertAllHaveParents() const {
-    assert(isRooted());
-    doSomethingPostOrder([this](Node_Id n_id){
-        const Node& node = getNode(n_id);
-        assert(n_id == getRoot() || node.parent.has_value());
-    });
 }
 
 void TreeDecomposition::bridgeDifference(const Node_Id parent_id) {
@@ -224,19 +197,11 @@ void TreeDecomposition::bridgeDifference(const Node_Id parent_id) {
     }
 
     addEdge(cur_n_id, child_id);
-
-    assertAfterBridgeDifference(parent_id, child_id);
 }
 
 void TreeDecomposition::makeNJoinNodeNice(Node_Id cur_n_id) {
     assert(isRooted());
     const auto& cur_node = nodes[cur_n_id];
-    std::unordered_set<Node_Id> different_children = filter<Node_Id>(cur_node.children, [this, &cur_node](Node_Id n_id) {
-        return getNode(n_id).bag != cur_node.bag;
-    });
-    if (different_children.empty()) { // todo: remove
-        return;
-    }
 
     const std::vector<Node_Id> node_children{cur_node.children.begin(), cur_node.children.end()};
     assert(node_children.size() >= 2);
@@ -282,20 +247,6 @@ void TreeDecomposition::makeNJoinNodeNice(Node_Id cur_n_id) {
         assert(*getNode(full_bag_node).children.begin() == child_id);
         bridgeDifference(full_bag_node);
     }
-}
-
-void TreeDecomposition::assertAfterBridgeDifference(Node_Id ancestor, Node_Id descendant) const {
-    Node_Id cur_id = ancestor;
-    while (cur_id != descendant) {
-        const Node& cur = getNode(cur_id);
-        assert(cur.children.size() == 1);
-        Node_Id curs_child_id = *cur.children.begin();
-        const Node& curs_child = getNode(curs_child_id);
-        assert(curs_child.parent.value() == cur_id);
-        cur_id = curs_child_id;
-    }
-    const Node& cur = getNode(cur_id);
-    assert(cur.parent.has_value());
 }
 
 void TreeDecomposition::assertIntroduceNodeHasTwoEqualChildren(Node_Id n_id) const {

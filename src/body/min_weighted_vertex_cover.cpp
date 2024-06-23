@@ -11,13 +11,7 @@ Solution MinWeightedVertexCover::solve()
     assert(td.isRooted());
     assert(td.isNiceTreeDecomposition());
 
-    int counter = 0;
-
-    std::unordered_set<Node_Id> visited_nodes; // todo: remove
-    td.doSomethingPostOrder([this, &counter, &visited_nodes](const Node_Id t_id) {
-        assert(visited_nodes.find(t_id) == visited_nodes.end());
-        visited_nodes.insert(t_id);
-        counter++;
+    td.doSomethingPostOrder([this](const Node_Id t_id) {
         assert(M.find(t_id) == M.end());
         M.insert({t_id, {}});
 
@@ -35,7 +29,6 @@ Solution MinWeightedVertexCover::solve()
         else if (t.children.size() == 1) {
             Node_Id t_prime_id = *t.children.begin();
             const auto t_prime = td.getNode(t_prime_id);
-            assert(M.find(t_prime_id) != M.end()); // todo: remove
             const auto prime_table = M.at(t_prime_id);
             size_t first_prime_table_size = M.at(t_prime_id).size();
             assert(prime_table.size() == M.at(t_prime_id).size());
@@ -161,7 +154,6 @@ void MinWeightedVertexCover::printM() const {
 std::unordered_set<Vertex_Cover> MinWeightedVertexCover::intersect(Node_Id n1_id, Node_Id n2_id) const {
     std::unordered_set<Vertex_Cover> covers1;
     std::unordered_set<Vertex_Cover> covers2;
-    // todo: fix this to actually return the intersections of U_prime and U_prime_prime
     for (const std::pair<Vertex_Cover, Solution>& bla : M.at(n1_id)) {
         covers1.insert(bla.first);
     }
