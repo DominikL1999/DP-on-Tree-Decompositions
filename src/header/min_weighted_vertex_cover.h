@@ -26,8 +26,6 @@ public:
 
     Solution solve();
 
-    void assertMContainsTheWholeBag(Node_Id n_id) const;
-
     void printM() const;
 
     std::unordered_map<Node_Id, Table>M;

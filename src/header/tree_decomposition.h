@@ -94,8 +94,6 @@ public:
     // Given the id of a node with more than one child, fills the space between it and its children such that every node in between is either a join node or an introduce node or a forget node.
     void makeNJoinNodeNice(Node_Id parent_id);
 
-    void assertIntroduceNodeHasTwoEqualChildren(Node_Id n_id) const;
-
     std::vector<Node_Id> getAllNodeIds() const;
 
     std::vector<std::string> getAllNodeNames() const;

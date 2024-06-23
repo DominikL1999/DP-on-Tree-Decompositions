@@ -4,8 +4,6 @@ directory_in_str : str = "."
 directory = os.fsencode(directory_in_str)
 
 def reformatGraphFile(filename : str):
-    assert(filename.endswith(".gr"))
-
     vertices : set[str] = set()
 
     input = open(filename, "r")
@@ -32,8 +30,6 @@ def reformatGraphFile(filename : str):
     output.close()
 
 def reformatTdFile(filename : str):
-    assert(filename.endswith(".td"))
-    
     input = open(filename, "r")
     output = open((filename + ".csv"), "w")
 

@@ -1,6 +1,5 @@
 #include "min_weighted_vertex_cover.h"
 
-#include <cassert>
 #include <numeric>
 
 using std::cout;
@@ -8,38 +7,28 @@ using std::endl;
 
 Solution MinWeightedVertexCover::solve()
 {
-    assert(td.isRooted());
-    assert(td.isNiceTreeDecomposition());
-
     td.doSomethingPostOrder([this](const Node_Id t_id) {
-        assert(M.find(t_id) == M.end());
         M.insert({t_id, {}});
 
         // update M here
         const auto t = td.getNode(t_id);
         
         if (t.children.empty()) { // is a leaf node
-            assert(t.bag.size() == 1);
             Vertex_Id v = *t.bag.begin();
 
             M[t_id][{}] = {{}, 0};
             M[t_id][{v}] = {{v}, graph.getWeight(v)};
-            assertMContainsTheWholeBag(t_id);
         }
         else if (t.children.size() == 1) {
             Node_Id t_prime_id = *t.children.begin();
             const auto t_prime = td.getNode(t_prime_id);
             const auto prime_table = M.at(t_prime_id);
             size_t first_prime_table_size = M.at(t_prime_id).size();
-            assert(prime_table.size() == M.at(t_prime_id).size());
 
             if (t.bag.size() > t_prime.bag.size()) { // node is an introduce node
-                assert(t.bag.size() - t_prime.bag.size() == 1);
                 // get extra vertex
                 auto diff = setDifferrence(t.bag, t_prime.bag);
-                assert(diff.size() == 1);
                 Vertex_Id v_id = *diff.begin();
-                assert(prime_table.size() == M.at(t_prime_id).size());
 
                 for (const auto pair : M.at(t_prime_id)) {
                     const Vertex_Cover& U_prime = pair.first;
@@ -53,21 +42,14 @@ Solution MinWeightedVertexCover::solve()
                         M[t_id][U_prime] = M.at(t_prime_id).at(U_prime);
                     }
                 }
-                assertMContainsTheWholeBag(t_id);
-                assert(prime_table.size() == first_prime_table_size); // If this goes off, then the local prime_table was changed somehow
-                assert(prime_table.size() == M.at(t_prime_id).size());
             }
             else { // node is a forget node
-                assert(t_prime.bag.size() - t.bag.size() == 1);
                 // get extra vertex
                 auto diff = setDifferrence(t_prime.bag, t.bag);
-                assert(diff.size() == 1);
                 Vertex_Id v_id = *diff.begin();
-                assert(prime_table.size() == M.at(t_prime_id).size());
                 for (const auto pair : M.at(t_prime_id)) {
                     
                     const Vertex_Cover& U_prime = pair.first;
-                    assert(M.at(t_prime_id).find(U_prime) != M.at(t_prime_id).end());
                     Vertex_Cover small_U_prime = setDifferrence(U_prime, {v_id});
                     auto it = M.at(t_prime_id).find(small_U_prime);
                     const auto& sol_U_prime = M.at(t_prime_id).at(U_prime);
@@ -78,22 +60,14 @@ Solution MinWeightedVertexCover::solve()
                         const auto& sol_small_U_prime = M.at(t_prime_id).at(small_U_prime);
                         M[t_id][small_U_prime] = std::min(sol_U_prime, sol_small_U_prime);
                     }
-                    // M[t_id][U_prime] = std::min(M.at(t_prime_id).at(U_prime), M.at(t_prime_id).at(small_U_prime));
-                    assert(prime_table.size() == first_prime_table_size); // If this goes off, then the local prime_table was changed somehow
-                    assert(prime_table.size() == M.at(t_prime_id).size());
                 }
-                assertMContainsTheWholeBag(t_id);
-                assert(prime_table.size() == first_prime_table_size); // If this goes off, then the local prime_table was changed somehow
-                assert(prime_table.size() == M.at(t_prime_id).size());
             }
 
-            assert(prime_table.size() == M.at(t_prime_id).size());
 
             // remove all entries for the child to reclaim memory space.
             M.erase(t_prime_id);
         }
         else { // is a join node
-            assert(t.children.size() == 2);
             auto it = t.children.begin();
             Node_Id t1_id = *it;
             it++;
@@ -111,14 +85,11 @@ Solution MinWeightedVertexCover::solve()
                 auto extra_weight = std::accumulate(U_prime.begin(), U_prime.end(), 0, [this](Vertex_Cover_Weight weight, Vertex_Id v_id){return weight + graph.getWeight(v_id);});
                 M[t_id][U_prime] = {U_prime, weight1 + weight2 - extra_weight};
             }
-            assertMContainsTheWholeBag(t_id);
 
             // remove all entries for both children to reclaim memory space.
             M.erase(t1_id);
             M.erase(t2_id);
         }
-
-        assert(M.at(t_id).find(t.bag) != M.at(t_id).end());
     });
 
     Node_Id root_id = td.getRoot();
@@ -127,11 +98,6 @@ Solution MinWeightedVertexCover::solve()
     });
 
     return min_solution.second;
-}
-
-void MinWeightedVertexCover::assertMContainsTheWholeBag(Node_Id n_id) const {
-    const Node& n = td.getNode(n_id);
-    assert(M.at(n_id).find(n.bag) != M.at(n_id).end());
 }
 
 void MinWeightedVertexCover::printM() const {
@@ -165,7 +131,6 @@ std::unordered_set<Vertex_Cover> MinWeightedVertexCover::intersect(Node_Id n1_id
 
 Solution MinWeightedVertexCover::addToSolution(const Solution &sol, Vertex_Id v_id) const
 {
-    assert(!sol.past_vertex_cover.contains(v_id));
     return {setUnion(sol.past_vertex_cover, {v_id}), sol.total_weight + graph.getWeight(v_id)};
 }
 
